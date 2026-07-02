@@ -3,7 +3,7 @@
 
 #include <SDL3/SDL.h>
 
-#include "game.hpp"
+#include "renderer.hpp"
 
 namespace sdl {
 

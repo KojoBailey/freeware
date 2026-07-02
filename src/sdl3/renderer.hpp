@@ -2,6 +2,8 @@
 #define KOJO_SDL3_RENDERER_HPP
 
 #include "window.hpp"
+#include "texture.hpp"
+#include "rect.hpp"
 
 #include <cstdint>
 
@@ -38,6 +40,11 @@ public:
 	void present()
 	{
 		SDL_RenderPresent(handle.get());
+	}
+
+	void render(Texture& texture, const Rect<float>& rect)
+	{
+		SDL_RenderTexture(handle.get(), texture.get(), nullptr, (const SDL_FRect*)&rect);
 	}
 	
 private:

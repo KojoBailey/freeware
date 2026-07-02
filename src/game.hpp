@@ -1,11 +1,7 @@
-#ifndef KOJO_SDL3_GAME_HPP
-#define KOJO_SDL3_GAME_HPP
+#ifndef KOJO_FREEWARE_GAME_HPP
+#define KOJO_FREEWARE_GAME_HPP
 
-#include "renderer.hpp"
-#include "rect.hpp"
-#include "texture.hpp"
-
-namespace sdl {
+#include "sdl3/sdl.hpp"
 
 class Game {
 public:
@@ -14,13 +10,13 @@ public:
 	{
 		Game result;
 
-		auto maybe_window = Window::create(title, _width, _height);
+		auto maybe_window = sdl::Window::create(title, _width, _height);
 		if (!maybe_window.has_value()) {
 			return std::unexpected{maybe_window.error()};
 		}
 		result.window = std::move(*maybe_window);
 
-		auto maybe_renderer = Renderer::create(result.window);
+		auto maybe_renderer = sdl::Renderer::create(result.window);
 		if (!maybe_renderer.has_value()) {
 			return std::unexpected{maybe_renderer.error()};
 		}
@@ -63,14 +59,9 @@ public:
 		renderer.present();
 	}
 
-	auto get_renderer() -> Renderer&
+	auto get_renderer() -> sdl::Renderer&
 	{
 		return renderer;
-	}
-
-	void render(Texture& texture, const Rect<float>& rect)
-	{
-		SDL_RenderTexture(renderer.get(), texture.get(), nullptr, (const SDL_FRect*)&rect);
 	}
 
 	auto get_width() -> int { return width; }
@@ -83,12 +74,10 @@ private:
 	bool is_running;
 	SDL_Event event;
 
-	Window window;
-	Renderer renderer;
+	sdl::Window window;
+	sdl::Renderer renderer;
 
 	int width, height;
 };
-
-}
 
 #endif
