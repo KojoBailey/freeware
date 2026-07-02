@@ -19,7 +19,6 @@ public:
 		if (result.handle == nullptr) {
 			return std::unexpected{SDL_GetError()};
 		}
-		result.renderer = &_renderer;
 		return result;
 	}
 
@@ -27,16 +26,9 @@ public:
 	{
 		return handle.get();
 	}
-
-	void render()
-	{
-		SDL_FRect rect = { 0, 0, 1280, 720 };
-		SDL_RenderTexture(renderer->get(), handle.get(), nullptr, &rect);
-	}
 	
 private:
 	std::unique_ptr<SDL_Texture, decltype([](SDL_Texture* t) { SDL_DestroyTexture(t); })> handle;
-	Renderer* renderer;
 };
 
 }

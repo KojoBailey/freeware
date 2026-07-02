@@ -4,7 +4,6 @@
 #include <SDL3/SDL.h>
 
 #include "game.hpp"
-#include "texture.hpp"
 
 namespace sdl {
 

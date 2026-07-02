@@ -2,17 +2,19 @@
 #define KOJO_SDL3_GAME_HPP
 
 #include "renderer.hpp"
+#include "rect.hpp"
+#include "texture.hpp"
 
 namespace sdl {
 
 class Game {
 public:
-	static auto create(std::string_view title, const int width, const int height)
+	static auto create(std::string_view title, const int _width, const int _height)
 		-> std::expected<Game, std::string>
 	{
 		Game result;
 
-		auto maybe_window = Window::create(title, width, height);
+		auto maybe_window = Window::create(title, _width, _height);
 		if (!maybe_window.has_value()) {
 			return std::unexpected{maybe_window.error()};
 		}
@@ -25,6 +27,9 @@ public:
 		result.renderer = std::move(*maybe_renderer);
 
 		result.is_running = true;
+
+		result.width = _width;
+		result.height = _height;
 
 		return result;
 	}
@@ -63,12 +68,25 @@ public:
 		return renderer;
 	}
 
+	void render(Texture& texture, const Rect<float>& rect)
+	{
+		SDL_RenderTexture(renderer.get(), texture.get(), nullptr, (const SDL_FRect*)&rect);
+	}
+
+	auto get_width() -> int { return width; }
+	auto get_height() -> int { return height; }
+
+	auto get_width_float() -> float { return (float)width; }
+	auto get_height_float() -> float { return (float)height; }
+
 private:
 	bool is_running;
 	SDL_Event event;
 
 	Window window;
 	Renderer renderer;
+
+	int width, height;
 };
 
 }
