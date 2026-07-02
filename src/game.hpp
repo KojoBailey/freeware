@@ -37,10 +37,8 @@ public:
 
 	void check_should_quit()
 	{
-		while (SDL_PollEvent(&event)) {
-			if (event.type == SDL_EVENT_QUIT) {
-				is_running = false;
-			}
+		if (event.type == SDL_EVENT_QUIT) {
+			is_running = false;
 		}
 	}
 
@@ -70,9 +68,9 @@ public:
 	auto get_width_float() -> float { return (float)width; }
 	auto get_height_float() -> float { return (float)height; }
 
+	SDL_Event event;
 private:
 	bool is_running;
-	SDL_Event event;
 
 	sdl::Window window;
 	sdl::Renderer renderer;

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <print>
+#include <vector>
 
 enum AppTerminationResult : int {
 	Ok = 0,
@@ -18,6 +19,9 @@ auto unwrap_or_exit(std::expected<T, std::string> maybe)
 	}
 	return std::move(*maybe);
 }
+
+template<typename T>
+struct Vec2 { T x, y; };
 
 int main()
 {
@@ -52,8 +56,19 @@ int main()
 		.height = grid_size
 	};
 
+	std::vector<Vec2<float>> apps;
+
 	while (!game.should_quit()) {
-		game.check_should_quit();
+		auto& event = game.event;
+		while (SDL_PollEvent(&event)) {
+			game.check_should_quit();
+
+			if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+				if (event.button.button == SDL_BUTTON_LEFT) {
+					apps.emplace_back(app_target_x, app_target_y);
+				}
+			}
+		}
 
 		game.clear();
 
@@ -61,6 +76,7 @@ int main()
 
 		float mouse_x, mouse_y;
 		SDL_MouseButtonFlags buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
+
 		app_target_x = std::floor((mouse_x - (app_rect.width / 2.0f)) / grid_size) * grid_size;
 		app_target_x += grid_size / 2.0f;
 		app_target_y = std::floor((mouse_y - (app_rect.height / 2.0f)) / grid_size) * grid_size;
@@ -72,8 +88,15 @@ int main()
 		SDL_SetRenderDrawColor(game.get_renderer().get(), 255, 255, 255, 100);
 		selection_box.x = app_target_x - app_padding / 2.0f;
 		selection_box.y = app_target_y - app_padding / 2.0f;
-		SDL_RenderFillRect(game.get_renderer().get(), (const SDL_FRect*)&selection_box);
 
+		for (auto& placed_app : apps) {
+			auto placed_app_rect = app_rect;
+			placed_app_rect.x = placed_app.x;
+			placed_app_rect.y = placed_app.y;
+			game.get_renderer().render(app, placed_app_rect);
+		}
+
+		SDL_RenderFillRect(game.get_renderer().get(), (const SDL_FRect*)&selection_box);
 		game.get_renderer().render(app, app_rect);
 
 		game.set_draw_color(0, 0, 0);
