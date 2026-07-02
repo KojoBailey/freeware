@@ -8,23 +8,23 @@ enum AppTerminationResult : int {
 	Error = 1,
 };
 
+template<typename T>
+auto unwrap_or_exit(std::expected<T, std::string> maybe)
+{
+	if (not maybe.has_value()) {
+		std::println(std::cerr, "[ERROR] {}", maybe.error());
+		std::exit(AppTerminationResult::Error);
+	}
+	return std::move(*maybe);
+}
+
 int main()
 {
 	sdl::init();
 
-	auto maybe_game = Game::create("Desktop Defence", 1280, 720);
-	if (!maybe_game.has_value()) {
-		std::println(std::cerr, "[ERROR] {}", maybe_game.error());
-		return AppTerminationResult::Error;
-	}
-	Game game = std::move(*maybe_game);
+	auto game = unwrap_or_exit(Game::create("Desktop Defence", 1280, 720));
 
-	auto maybe_background = sdl::Texture::create(game.get_renderer(), "./assets/Windows_XP_Wallpaper.png");
-	if (!maybe_background.has_value()) {
-		std::println(std::cerr, "[ERROR] {}", maybe_background.error());
-		return AppTerminationResult::Error;
-	}
-	sdl::Texture background = std::move(*maybe_background);
+	auto background = unwrap_or_exit(sdl::Texture::create(game.get_renderer(), "./assets/Windows_XP_Wallpaper.png"));
 
 	constexpr float aspect_ratio = 4.0f / 3.0f;
 	const float screen_height = game.get_height_float();
