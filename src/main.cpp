@@ -26,6 +26,11 @@ auto unwrapOrExit(std::expected<T, std::string> maybe) -> T
 	return std::move(*maybe);
 }
 
+auto snapToGrid(float inputX, float gridSize, float offset = 0) -> float
+{
+	return std::floor((inputX - offset) / gridSize) * gridSize + offset;
+}
+
 int main()
 {
 	init(InitFlag::Video);
@@ -97,9 +102,9 @@ int main()
 
 		Vec<float, 2> mousePos = getMouseState().position;
 
-		appTarget.x = (std::floor(mousePos.x / gridLength) * gridLength;
+		appTarget.x = snapToGrid(mousePos.x, gridLength, -60.0f);
 		appTarget.x += gridLength / 2.0f;
-		appTarget.y = std::floor(mousePos.y / gridLength) * gridLength;
+		appTarget.y = snapToGrid(mousePos.y, gridLength, 0.0f);
 		appTarget.y += gridLength / 2.0f;
 		appRect.position.x += (appTarget.x - appRect.position.x) / 300.0f;
 		appRect.position.y += (appTarget.y - appRect.position.y) / 300.0f;
