@@ -26,10 +26,19 @@ auto unwrapOrExit(std::expected<T, std::string> maybe) -> T
 	return std::move(*maybe);
 }
 
-auto snapToGrid(float inputX, float gridSize, float offset = 0) -> float
-{
-	return std::floor((inputX - offset) / gridSize) * gridSize + offset;
-}
+class Grid {
+public:
+	Vec<float, 2> size;
+	Vec<float, 2> offset;
+
+	auto snap(Vec<float, 2>& input) const -> Vec<float, 2>
+	{
+		return Vec<float, 2>{
+			.x = std::floor((input.x - offset.x) / size.x) * size.x + offset.x,
+			.y = std::floor((input.y - offset.y) / size.y) * size.y + offset.y,
+		};
+	}
+};
 
 int main()
 {
@@ -66,6 +75,16 @@ int main()
 	Vec<float, 2> appTarget;
 
 	constexpr float gridLength = appLength + appPadding;
+	const Grid grid = {
+		.size = {
+			.x = gridLength,
+			.y = gridLength,
+		},
+		.offset = {
+			.x = desktopRect.position.x,
+			.y = 0.0f,
+		},
+	};
 
 	Rect<float> selectionBox = {
 		.size {
@@ -102,9 +121,8 @@ int main()
 
 		Vec<float, 2> mousePos = getMouseState().position;
 
-		appTarget.x = snapToGrid(mousePos.x, gridLength, -60.0f);
+		appTarget = grid.snap(mousePos);
 		appTarget.x += gridLength / 2.0f;
-		appTarget.y = snapToGrid(mousePos.y, gridLength, 0.0f);
 		appTarget.y += gridLength / 2.0f;
 		appRect.position.x += (appTarget.x - appRect.position.x) / 300.0f;
 		appRect.position.y += (appTarget.y - appRect.position.y) / 300.0f;
