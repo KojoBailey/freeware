@@ -17,7 +17,7 @@ enum MainResult : int {
 };
 
 template<typename T>
-auto unwrapOrExit(std::expected<T, std::string> maybe)
+auto unwrapOrExit(std::expected<T, std::string> maybe) -> T
 {
 	if (not maybe.has_value()) {
 		std::println(std::cerr, "[ERROR] {}", maybe.error());
@@ -93,8 +93,7 @@ int main()
 
 		renderer.render(desktop, desktopRect);
 
-		MouseState mouseState = sdl::getMouseState();
-		Vec<float, 2>& mousePos = mouseState.position;
+		Vec<float, 2> mousePos = getMouseState().position;
 
 		appTarget.x = std::floor((mousePos.x - (appRect.size.x / 2.0f)) / gridLength) * gridLength;
 		appTarget.x += gridLength / 2.0f;
