@@ -8,7 +8,7 @@
 
 namespace sdl {
 
-enum EventType : std::uint32_t {
+enum class EventType : std::uint32_t {
 	First = 0, // Unused, but do not remove.
 	
 	/* Application Events */
@@ -92,12 +92,12 @@ public:
 		return SDL_PollEvent(&event);
 	}
 
-	auto get_type() -> EventType
+	auto getType() -> EventType
 	{
 		return static_cast<EventType>(event.type);
 	}
 
-	auto get_mouse_button() -> MouseButtonEvent
+	auto getMouseButton() -> MouseButtonEvent
 	{
 		return MouseButtonEvent{event.button};
 	}

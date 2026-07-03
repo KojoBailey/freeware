@@ -13,7 +13,7 @@
 
 namespace sdl {
 
-enum WindowFlag : std::uint64_t {
+enum class WindowFlag : std::uint64_t {
 	None              = 0,
 	Fullscreen        = 0x0000000000000001,
 	OpenGL            = 0x0000000000000002, // Usable with OpenGL context.
@@ -46,11 +46,11 @@ enum WindowFlag : std::uint64_t {
 
 class Window {
 public:
-	static auto create(std::string_view title, const Vec2<float> dimensions, const WindowFlag flags = WindowFlag::None)
+	static auto create(std::string_view title, const Vec<float, 2> size, const WindowFlag flags = WindowFlag::None)
 		-> std::expected<Window, std::string>
 	{
 		Window result;
-		result.handle.reset(SDL_CreateWindow(title.data(), (int)dimensions.x, (int)dimensions.y, 0));
+		result.handle.reset(SDL_CreateWindow(title.data(), (int)size.x, (int)size.y, 0));
 		if (result.handle == nullptr) {
 			return std::unexpected{SDL_GetError()};
 		}

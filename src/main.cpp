@@ -30,50 +30,59 @@ int main()
 {
 	init(InitFlag::Video);
 
-	constexpr Vec2<float> WINDOW_DIMENSIONS { .x = 1280, .y = 720 };
-	auto window = unwrapOrExit(Window::create("FreeWare", WINDOW_DIMENSIONS));
+	constexpr Vec<float, 2> WINDOW_SIZE { .x = 1280, .y = 720 };
+	auto window = unwrapOrExit(Window::create("FreeWare", WINDOW_SIZE));
 	auto renderer = unwrapOrExit(Renderer::create(window));
 
 	Texture desktop = unwrapOrExit(renderer.loadTexture("./assets/Windows_XP_Wallpaper.png"));
 	constexpr float aspectRatio = 4.0f / 3.0f;
-	const float desktopWidth = WINDOW_DIMENSIONS.y * aspectRatio;
+	const float desktopWidth = WINDOW_SIZE.y * aspectRatio;
 	const Rect<float> desktopRect = {
-		.x = (WINDOW_DIMENSIONS.x - desktopWidth) / 2.0f,
-		.y = 0,
-		.width = desktopWidth,
-		.height = WINDOW_DIMENSIONS.y
+		.position = {
+			.x = (WINDOW_SIZE.x - desktopWidth) / 2.0f,
+			.y = 0,
+		},
+		.size = {
+			.x = desktopWidth,
+			.y = WINDOW_SIZE.y,
+		},
 	};
 
 	constexpr float appLength = 70.0f;
 	constexpr float appPadding = 40.0f;
 	Texture app = unwrapOrExit(renderer.loadTexture("./assets/Vim.png"));
 	Rect<float> appRect = {
-		.width = appLength,
-		.height = appLength
+		.size {
+			.x = appLength,
+			.y = appLength,
+		},
 	};
-	Vec2<float> appTarget;
+	Vec<float, 2> appTarget;
 
 	constexpr float gridLength = appLength + appPadding;
 
 	Rect<float> selectionBox = {
-		.width = gridLength,
-		.height = gridLength
+		.size {
+			.x = gridLength,
+			.y = gridLength,
+		},
 	};
 
-	std::vector<Vec2<float>> apps;
+	std::vector<Vec<float, 2>> apps;
 
 	Event event;
 	bool isRunning = true;
 
 	while (isRunning) {
 		while (event.poll()) {
-			switch (event.get_type()) {
+			switch (event.getType()) {
 			case EventType::Quit:
 				isRunning = false;
 				break;
 			case EventType::MouseButtonDown:
-				if (event.get_mouse_button().get_button_type() == MouseButtonType::Left) {
+				if (event.getMouseButton().getButtonType() == MouseButtonType::Left) {
 					apps.emplace_back(appTarget.x, appTarget.y);
+
 				}
 				break;
 			default: break;
@@ -84,29 +93,29 @@ int main()
 
 		renderer.render(desktop, desktopRect);
 
-		float mouse_x, mouse_y;
-		SDL_MouseButtonFlags buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
+		MouseState mouseState = sdl::getMouseState();
+		Vec<float, 2>& mousePos = mouseState.position;
 
-		appTarget.x = std::floor((mouse_x - (appRect.width / 2.0f)) / gridLength) * gridLength;
+		appTarget.x = std::floor((mousePos.x - (appRect.size.x / 2.0f)) / gridLength) * gridLength;
 		appTarget.x += gridLength / 2.0f;
-		appTarget.y = std::floor((mouse_y - (appRect.height / 2.0f)) / gridLength) * gridLength;
+		appTarget.y = std::floor((mousePos.y - (appRect.size.y / 2.0f)) / gridLength) * gridLength;
 		appTarget.y += gridLength / 2.0f;
-		appRect.x += (appTarget.x - appRect.x) / 300.0f;
-		appRect.y += (appTarget.y - appRect.y) / 300.0f;
+		appRect.position.x += (appTarget.x - appRect.position.x) / 300.0f;
+		appRect.position.y += (appTarget.y - appRect.position.y) / 300.0f;
 
-		SDL_SetRenderDrawBlendMode(renderer.get(), SDL_BLENDMODE_BLEND);
-		SDL_SetRenderDrawColor(renderer.get(), 255, 255, 255, 100);
-		selectionBox.x = appTarget.x - appPadding / 2.0f;
-		selectionBox.y = appTarget.y - appPadding / 2.0f;
+		renderer.setDrawBlendMode(BlendMode::Blend);
+		renderer.setDrawColor(255, 255, 255, 100);
+		selectionBox.position.x = appTarget.x - appPadding / 2.0f;
+		selectionBox.position.y = appTarget.y - appPadding / 2.0f;
 
 		for (auto& placedApp : apps) {
 			auto placedAppRect = appRect;
-			placedAppRect.x = placedApp.x;
-			placedAppRect.y = placedApp.y;
+			placedAppRect.position.x = placedApp.x;
+			placedAppRect.position.y = placedApp.y;
 			renderer.render(app, placedAppRect);
 		}
 
-		SDL_RenderFillRect(renderer.get(), (const SDL_FRect*)&selectionBox);
+		renderer.fillRect(selectionBox);
 		renderer.render(app, appRect);
 
 		renderer.setDrawColor(0, 0, 0);

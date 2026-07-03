@@ -3,7 +3,8 @@
 
 #include "Window.hpp"
 #include "Texture.hpp"
-#include "rect.hpp"
+#include "Rect.hpp"
+#include "BlendMode.hpp"
 
 #include <SDL3/SDL_render.h>
 
@@ -16,7 +17,7 @@ constexpr std::uint8_t ALPHA_TRANSPARENT = 0;
 
 class Renderer {
 public:
-	static auto create(Window& window, const char* name = nullptr)
+	[[nodiscard]] static auto create(Window& window, const char* name = nullptr)
 		-> std::expected<Renderer, std::string>
 	{
 		Renderer result;
@@ -27,7 +28,7 @@ public:
 		return result;
 	}
 
-	auto get() -> SDL_Renderer*
+	[[nodiscard]] auto get() -> SDL_Renderer*
 	{
 		return handle.get();
 	}
@@ -52,7 +53,7 @@ public:
 		SDL_RenderTexture(handle.get(), texture.get(), nullptr, (const SDL_FRect*)&rect);
 	}
 
-	auto loadTexture(const std::filesystem::path& file)
+	[[nodiscard]] auto loadTexture(const std::filesystem::path& file)
 		-> std::expected<Texture, std::string>
 	{
 		SDL_Texture* result = IMG_LoadTexture(handle.get(), file.c_str());
@@ -60,6 +61,17 @@ public:
 			return std::unexpected{SDL_GetError()};
 		}
 		return Texture{result};
+	}
+
+	void fillRect(const Rect<float>& rect)
+	{
+		SDL_RenderFillRect(handle.get(), (const SDL_FRect*)&rect);
+	}
+
+
+	void setDrawBlendMode(const BlendMode blendMode)
+	{
+		SDL_SetRenderDrawBlendMode(handle.get(), static_cast<SDL_BlendMode>(blendMode));
 	}
 
 private:

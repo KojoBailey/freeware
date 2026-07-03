@@ -7,7 +7,7 @@
 
 namespace sdl {
 
-enum InitFlag : std::uint32_t {
+enum class InitFlag : std::uint32_t {
 	Audio    = 0x00000010, // Implies Events.
 	Video    = 0x00000020, // Implies Events. Initialise on main thread.
 	Joystick = 0x00000200, // Implies Events.
@@ -34,7 +34,7 @@ constexpr auto operator|=(InitFlag& lhs, InitFlag rhs) -> InitFlag
 
 void init(InitFlag flags)
 {
-	SDL_Init(flags);
+	SDL_Init(static_cast<SDL_InitFlags>(flags));
 }
 
 void quit()
