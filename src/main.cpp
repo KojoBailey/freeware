@@ -57,16 +57,18 @@ int main()
 			.y = appLength,
 		},
 	};
+	appRect.anchorMiddle();
 	Vec<float, 2> appTarget;
 
 	constexpr float gridLength = appLength + appPadding;
 
 	Rect<float> selectionBox = {
 		.size {
-			.x = gridLength,
-			.y = gridLength,
+			.x = gridLength * 0.9f,
+			.y = gridLength * 0.9f,
 		},
 	};
+	selectionBox.anchorMiddle();
 
 	std::vector<Vec<float, 2>> apps;
 
@@ -95,17 +97,17 @@ int main()
 
 		Vec<float, 2> mousePos = getMouseState().position;
 
-		appTarget.x = std::floor((mousePos.x - (appRect.size.x / 2.0f)) / gridLength) * gridLength;
+		appTarget.x = std::floor(mousePos.x / gridLength) * gridLength;
 		appTarget.x += gridLength / 2.0f;
-		appTarget.y = std::floor((mousePos.y - (appRect.size.y / 2.0f)) / gridLength) * gridLength;
+		appTarget.y = std::floor(mousePos.y / gridLength) * gridLength;
 		appTarget.y += gridLength / 2.0f;
 		appRect.position.x += (appTarget.x - appRect.position.x) / 300.0f;
 		appRect.position.y += (appTarget.y - appRect.position.y) / 300.0f;
 
 		renderer.setDrawBlendMode(BlendMode::Blend);
 		renderer.setDrawColor(255, 255, 255, 100);
-		selectionBox.position.x = appTarget.x - appPadding / 2.0f;
-		selectionBox.position.y = appTarget.y - appPadding / 2.0f;
+		selectionBox.position.x = appTarget.x;
+		selectionBox.position.y = appTarget.y;
 
 		for (auto& placedApp : apps) {
 			auto placedAppRect = appRect;

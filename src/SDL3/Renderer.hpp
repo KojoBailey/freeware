@@ -50,7 +50,8 @@ public:
 
 	void render(Texture& texture, const Rect<float>& rect)
 	{
-		SDL_RenderTexture(handle.get(), texture.get(), nullptr, (const SDL_FRect*)&rect);
+		SDL_FRect sdlFRect = rect.toSdlFRect();
+		SDL_RenderTexture(handle.get(), texture.get(), nullptr, &sdlFRect);
 	}
 
 	[[nodiscard]] auto loadTexture(const std::filesystem::path& file)
@@ -65,7 +66,8 @@ public:
 
 	void fillRect(const Rect<float>& rect)
 	{
-		SDL_RenderFillRect(handle.get(), (const SDL_FRect*)&rect);
+		SDL_FRect sdlFRect = rect.toSdlFRect();
+		SDL_RenderFillRect(handle.get(), &sdlFRect);
 	}
 
 
