@@ -83,6 +83,101 @@ enum class EventType : std::uint32_t {
 	MouseWheel,
 	MouseAdded,
 	MouseRemoved,
+
+	/* Joystick Events */
+	JoystickAxisMotion = 0x600,
+	JoystickBallMotion,
+	JoystickHatMotion,
+	JoystickButtonDown,
+	JoystickButtonUp,
+	JoystickAdded,
+	JoystickRemoved,
+	JoystickBatteryUpdated,
+	JoystickUpdateComplete,
+
+	/* Gamepad Events */
+	GamepadAxisMotion = 0x650,
+	GamepadButtonDown,
+	GamepadButtonUp,
+	GamepadAdded,
+	GamepadRemoved,
+	GamepadRemapped,
+	GamepadTouchpadDown,
+	GamepadTouchpadMotion,
+	GamepadTouchpadUp,
+	GamepadSensorUpdate,
+	GamepadUpdateComplete,
+	GamepadSteamHandleUpdated,
+	GamepadCapSenseTouch,
+	GamepadCapSenseRelease,
+
+	/* Touch Events */
+	FingerDown = 0x700,
+	FingerUp,
+	FingerMotion,
+	FingerCanceled,
+
+	/* Pinch Events */
+	PinchBegin = 0x710,
+	PinchUpdate,
+	PinchEnd,
+
+	/* Clipboard Events */
+	ClipboardUpdate = 0x900,
+
+	/* Drag&Drop Events */
+	DropFile = 0x1000,
+	DropText,
+	DropBegin,
+	DropComplete,
+	DropPosition,
+
+	/* Audio Hotplug Events */
+	AudioDeviceAdded = 0x1100,
+	AudioDeviceRemoved,
+	AudioDeviceFormatChanged,
+
+	/* Sensor Events */
+	SensorUpdate = 0x1200,
+
+	/* Pressure-Sensitive Pen Events */
+	PenProximityIn = 0x1300,
+	PenProximityOut,
+	PenDown,
+	PenUp,
+	PenButtonDown,
+	PenButtonUp,
+	PenMotion,
+	PenAxis,
+
+	/* Camera Hotplug Events */
+	CameraDeviceAdded = 0x1400,
+	CameraDeviceRemoved,
+	CameraDeviceApproved,
+	CameraDeviceDenied,
+
+	/* Notification Events */
+	NotificationActionInvoked = 0x1500,
+
+	/* Render Events */
+	RenderTargetsReset = 0x2000,
+	RenderDeviceReset,
+	RenderDeviceLost,
+
+	/* Reserved Events for Private Platforms */
+	Private0 = 0x4000,
+	Private1,
+	Private2,
+	Private3,
+
+	/* Internal Events */
+	PollSentinel = 0x7F00,
+
+	/* User-Defined Events */
+	UserBegin = 0x8000,
+	UserLast  = 0xFFFF,
+
+	EnumPadding = 0x7FFFFFFF, // Fills u32.
 };
 
 class Event {

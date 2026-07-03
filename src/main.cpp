@@ -97,7 +97,7 @@ int main()
 
 		Vec<float, 2> mousePos = getMouseState().position;
 
-		appTarget.x = std::floor(mousePos.x / gridLength) * gridLength;
+		appTarget.x = (std::floor(mousePos.x / gridLength) * gridLength;
 		appTarget.x += gridLength / 2.0f;
 		appTarget.y = std::floor(mousePos.y / gridLength) * gridLength;
 		appTarget.y += gridLength / 2.0f;
