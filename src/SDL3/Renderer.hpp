@@ -2,7 +2,7 @@
 #define KOJO_SDL3_RENDERER_HPP
 
 #include "Window.hpp"
-#include "texture.hpp"
+#include "Texture.hpp"
 #include "rect.hpp"
 
 #include <SDL3/SDL_render.h>

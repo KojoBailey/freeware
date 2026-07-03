@@ -34,7 +34,7 @@ int main()
 	auto window = unwrapOrExit(Window::create("FreeWare", WINDOW_DIMENSIONS));
 	auto renderer = unwrapOrExit(Renderer::create(window));
 
-	Texture background = unwrapOrExit(renderer.loadTexture("./assets/Windows_XP_Wallpaper.png"));
+	Texture desktop = unwrapOrExit(renderer.loadTexture("./assets/Windows_XP_Wallpaper.png"));
 	constexpr float aspectRatio = 4.0f / 3.0f;
 	const float desktopWidth = WINDOW_DIMENSIONS.y * aspectRatio;
 	const Rect<float> desktopRect = {
@@ -72,7 +72,7 @@ int main()
 				isRunning = false;
 				break;
 			case EventType::MouseButtonDown:
-				if (event.button.button == SDL_BUTTON_LEFT) {
+				if (event.get_mouse_button().get_button_type() == MouseButtonType::Left) {
 					apps.emplace_back(appTarget.x, appTarget.y);
 				}
 				break;
@@ -80,9 +80,9 @@ int main()
 			}
 		}
 
-		game.clear();
+		renderer.clear();
 
-		game.get_renderer().render(desktop, desktopRect);
+		renderer.render(desktop, desktopRect);
 
 		float mouse_x, mouse_y;
 		SDL_MouseButtonFlags buttons = SDL_GetMouseState(&mouse_x, &mouse_y);
@@ -94,8 +94,8 @@ int main()
 		appRect.x += (appTarget.x - appRect.x) / 300.0f;
 		appRect.y += (appTarget.y - appRect.y) / 300.0f;
 
-		SDL_SetRenderDrawBlendMode(game.get_renderer().get(), SDL_BLENDMODE_BLEND);
-		SDL_SetRenderDrawColor(game.get_renderer().get(), 255, 255, 255, 100);
+		SDL_SetRenderDrawBlendMode(renderer.get(), SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(renderer.get(), 255, 255, 255, 100);
 		selectionBox.x = appTarget.x - appPadding / 2.0f;
 		selectionBox.y = appTarget.y - appPadding / 2.0f;
 
@@ -103,14 +103,14 @@ int main()
 			auto placedAppRect = appRect;
 			placedAppRect.x = placedApp.x;
 			placedAppRect.y = placedApp.y;
-			game.get_renderer().render(app, placedAppRect);
+			renderer.render(app, placedAppRect);
 		}
 
-		SDL_RenderFillRect(game.get_renderer().get(), (const SDL_FRect*)&selectionBox);
-		game.get_renderer().render(app, appRect);
+		SDL_RenderFillRect(renderer.get(), (const SDL_FRect*)&selectionBox);
+		renderer.render(app, appRect);
 
-		game.set_draw_color(0, 0, 0);
-		game.present();
+		renderer.setDrawColor(0, 0, 0);
+		renderer.present();
 	}
 
 	quit();

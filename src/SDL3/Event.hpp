@@ -1,6 +1,8 @@
 #ifndef KOJO_SDL3_EVENT_HPP
 #define KOJO_SDL3_EVENT_HPP
 
+#include "MouseButtonEvent.hpp"
+
 #include <SDL3/SDL_events.h>
 #include <cstdint>
 
@@ -93,6 +95,11 @@ public:
 	auto get_type() -> EventType
 	{
 		return static_cast<EventType>(event.type);
+	}
+
+	auto get_mouse_button() -> MouseButtonEvent
+	{
+		return MouseButtonEvent{event.button};
 	}
 
 private:
