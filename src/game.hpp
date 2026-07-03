@@ -1,8 +1,6 @@
 #ifndef KOJO_FREEWARE_GAME_HPP
 #define KOJO_FREEWARE_GAME_HPP
 
-#include "sdl3/sdl.hpp"
-
 class Game {
 public:
 	static auto create(std::string_view title, const int _width, const int _height)

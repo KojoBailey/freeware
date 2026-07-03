@@ -11,8 +11,7 @@ class Renderer;
 
 class Texture {
 public:
-	static auto create(Renderer& _renderer, const std::filesystem::path& file)
-		-> std::expected<Texture, std::string>;
+	Texture(SDL_Texture* ptr) : handle{ptr} {}
 
 	auto get() -> SDL_Texture*
 	{
