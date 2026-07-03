@@ -1,12 +1,16 @@
+#include "grid.hpp"
+
 #include "SDL3/Init.hpp"
 #include "SDL3/Window.hpp"
 #include "SDL3/Renderer.hpp"
 #include "SDL3/Event.hpp"
+#include "SDL3/Clock.hpp"
 
 #include <cmath>
 #include <expected>
 #include <iostream>
 #include <print>
+#include <unordered_map>
 #include <vector>
 
 using namespace sdl;
@@ -26,20 +30,6 @@ auto unwrapOrExit(std::expected<T, std::string> maybe) -> T
 	return std::move(*maybe);
 }
 
-class Grid {
-public:
-	Vec<float, 2> size;
-	Vec<float, 2> offset;
-
-	auto snap(Vec<float, 2>& input) const -> Vec<float, 2>
-	{
-		return Vec<float, 2>{
-			.x = std::floor((input.x - offset.x) / size.x) * size.x + offset.x,
-			.y = std::floor((input.y - offset.y) / size.y) * size.y + offset.y,
-		};
-	}
-};
-
 int main()
 {
 	init(InitFlag::Video);
@@ -48,7 +38,10 @@ int main()
 	auto window = unwrapOrExit(Window::create("FreeWare", WINDOW_SIZE));
 	auto renderer = unwrapOrExit(Renderer::create(window));
 
-	Texture desktop = unwrapOrExit(renderer.loadTexture("./assets/Windows_XP_Wallpaper.png"));
+	std::unordered_map<std::string, Texture> texturePool;
+	texturePool.insert({"desktop", unwrapOrExit(renderer.loadTexture("./assets/Windows_XP_Wallpaper.png"))});
+	texturePool.insert({"app_vim", unwrapOrExit(renderer.loadTexture("./assets/Vim.png"))});
+
 	constexpr float aspectRatio = 4.0f / 3.0f;
 	const float desktopWidth = WINDOW_SIZE.y * aspectRatio;
 	const Rect<float> desktopRect = {
@@ -62,42 +55,40 @@ int main()
 		},
 	};
 
-	constexpr float appLength = 70.0f;
-	constexpr float appPadding = 40.0f;
-	Texture app = unwrapOrExit(renderer.loadTexture("./assets/Vim.png"));
-	Rect<float> appRect = {
+	Sprite appPreview{texturePool.at("app_vim"), {
 		.size {
-			.x = appLength,
-			.y = appLength,
+			.x = 70.0f,
+			.y = 70.0f,
 		},
-	};
-	appRect.anchorMiddle();
+	}};
+	appPreview.anchorCenter();
+
+	constexpr float appPadding = 40.0f;
 	Vec<float, 2> appTarget;
 
-	constexpr float gridLength = appLength + appPadding;
-	const Grid grid = {
-		.size = {
-			.x = gridLength,
-			.y = gridLength,
-		},
-		.offset = {
-			.x = desktopRect.position.x,
-			.y = 0.0f,
-		},
+	const float gridLength = appPreview.getSize().x + appPadding;
+	Grid<8, 6> grid;
+	grid.size = {
+		.x = gridLength,
+		.y = gridLength,
+	};
+	grid.position = {
+		.x = desktopRect.position.x,
+		.y = 0.0f,
 	};
 
 	Rect<float> selectionBox = {
-		.size {
-			.x = gridLength * 0.9f,
-			.y = gridLength * 0.9f,
-		},
+		.size = grid.size * 0.9f,
 	};
 	selectionBox.anchorMiddle();
 
-	std::vector<Vec<float, 2>> apps;
+	std::vector<Sprite> apps;
+	apps.reserve(grid.TILE_COUNT);
 
 	Event event;
 	bool isRunning = true;
+
+	std::uint64_t timeSave = Clock::getTicksSinceStart();
 
 	while (isRunning) {
 		while (event.poll()) {
@@ -107,8 +98,20 @@ int main()
 				break;
 			case EventType::MouseButtonDown:
 				if (event.getMouseButton().getButtonType() == MouseButtonType::Left) {
-					apps.emplace_back(appTarget.x, appTarget.y);
-
+					if (grid.isTileFree(appTarget)) {
+						Sprite app{texturePool.at("app_vim"),
+							Rect<float>{
+								.position = appTarget,
+								.size {
+									.x = 70.0f,
+									.y = 70.0f,
+								},
+							}
+						};
+						app.anchorCenter();
+						apps.push_back(app);
+						grid.occupyTile(appTarget);
+					}
 				}
 				break;
 			default: break;
@@ -117,30 +120,30 @@ int main()
 
 		renderer.clear();
 
-		renderer.render(desktop, desktopRect);
+		float deltaTime = (float)(Clock::getTicksSinceStart() - timeSave) / (float)Clock::getFrequency();
+		timeSave = Clock::getTicksSinceStart();
+
+		renderer.render(texturePool.at("desktop"), desktopRect);
 
 		Vec<float, 2> mousePos = getMouseState().position;
 
-		appTarget = grid.snap(mousePos);
-		appTarget.x += gridLength / 2.0f;
-		appTarget.y += gridLength / 2.0f;
-		appRect.position.x += (appTarget.x - appRect.position.x) / 300.0f;
-		appRect.position.y += (appTarget.y - appRect.position.y) / 300.0f;
+		auto snapResult = grid.snap(mousePos);
+		if (snapResult.has_value()) {
+			appTarget = *snapResult + (grid.size / 2.0f);
+		}
+		appPreview.changePos(((appTarget - appPreview.getPos()) * 8.0f) * deltaTime);
 
 		renderer.setDrawBlendMode(BlendMode::Blend);
 		renderer.setDrawColor(255, 255, 255, 100);
-		selectionBox.position.x = appTarget.x;
-		selectionBox.position.y = appTarget.y;
+		selectionBox.position = appTarget;
 
-		for (auto& placedApp : apps) {
-			auto placedAppRect = appRect;
-			placedAppRect.position.x = placedApp.x;
-			placedAppRect.position.y = placedApp.y;
-			renderer.render(app, placedAppRect);
+		for (Sprite& app : apps) {
+			app.changeY(std::sin(app.getSecondsSinceBirth() * 4.0f) * deltaTime * 10.0f);
+			renderer.render(app);
 		}
 
 		renderer.fillRect(selectionBox);
-		renderer.render(app, appRect);
+		renderer.render(appPreview);
 
 		renderer.setDrawColor(0, 0, 0);
 		renderer.present();

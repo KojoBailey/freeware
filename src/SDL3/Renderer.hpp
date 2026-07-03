@@ -4,6 +4,7 @@
 #include "Window.hpp"
 #include "Texture.hpp"
 #include "Rect.hpp"
+#include "Sprite.hpp"
 #include "BlendMode.hpp"
 
 #include <SDL3/SDL_render.h>
@@ -52,6 +53,12 @@ public:
 	{
 		SDL_FRect sdlFRect = rect.toSdlFRect();
 		SDL_RenderTexture(handle.get(), texture.get(), nullptr, &sdlFRect);
+	}
+
+	void render(Sprite& sprite)
+	{
+		SDL_FRect sdlFRect = sprite.getSdlFRect();
+		SDL_RenderTexture(handle.get(), sprite.getSdlTexture(), nullptr, &sdlFRect);
 	}
 
 	[[nodiscard]] auto loadTexture(const std::filesystem::path& file)
