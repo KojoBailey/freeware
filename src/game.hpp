@@ -22,47 +22,6 @@ public:
 		init();
 	}
 
-	void init()
-	{
-		sdl::init(InitFlag::Video);
-
-		constexpr Vec<float, 2> WINDOW_SIZE { .x = 1280, .y = 720 };
-		window = unwrapOrExit(Window::create("FreeWare", WINDOW_SIZE));
-		renderer = unwrapOrExit(Renderer::create(window));
-
-		texturePool.insert({"desktop", unwrapOrExit(renderer.loadTexture("./assets/Windows_XP_Wallpaper.png"))});
-		texturePool.insert({"app_vim", unwrapOrExit(renderer.loadTexture("./assets/Vim.png"))});
-
-		desktop = Desktop{WINDOW_SIZE, 4.0f / 3.0f};
-		desktop.setTexture(&texturePool.at("desktop"));
-
-		appPreview = Sprite{texturePool.at("app_vim"), { .size { .x = 70.0f, .y = 70.0f }}};
-		appPreview.anchorCenter();
-
-		Vec<float, 2> appTarget;
-
-		const float gridLength = appPreview.getSize().x + APP_PADDING;
-		grid.size = {
-			.x = gridLength,
-			.y = gridLength,
-		};
-		grid.position = {
-			.x = desktop.getRect().position.x,
-			.y = 0.0f,
-		};
-		apps.reserve(grid.TILE_COUNT);
-
-		selectionBox = {
-			.size = grid.size * 0.9f,
-		};
-		selectionBox.anchorMiddle();
-
-
-		isRunning = true;
-
-		timeSave = Clock::getTicksSinceStart();
-	}
-
 	auto isFinished() -> bool
 	{
 		return not isRunning;
@@ -139,6 +98,46 @@ private:
 	float deltaTime;
 
 	std::unordered_map<std::string, Texture> texturePool;
+
+	void init()
+	{
+		sdl::init(InitFlag::Video);
+
+		constexpr Vec<float, 2> WINDOW_SIZE { .x = 1280, .y = 720 };
+		window = unwrapOrExit(Window::create("FreeWare", WINDOW_SIZE));
+		renderer = unwrapOrExit(Renderer::create(window));
+
+		texturePool.insert({"desktop", unwrapOrExit(renderer.loadTexture("./assets/Windows_XP_Wallpaper.png"))});
+		texturePool.insert({"app_vim", unwrapOrExit(renderer.loadTexture("./assets/Vim.png"))});
+
+		desktop = Desktop{WINDOW_SIZE, 4.0f / 3.0f};
+		desktop.setTexture(&texturePool.at("desktop"));
+
+		appPreview = Sprite{texturePool.at("app_vim"), { .size { .x = 70.0f, .y = 70.0f }}};
+		appPreview.anchorCenter();
+
+		Vec<float, 2> appTarget;
+
+		const float gridLength = appPreview.getSize().x + APP_PADDING;
+		grid.size = {
+			.x = gridLength,
+			.y = gridLength,
+		};
+		grid.position = {
+			.x = desktop.getRect().position.x,
+			.y = 0.0f,
+		};
+		apps.reserve(grid.TILE_COUNT);
+
+		selectionBox = {
+			.size = grid.size * 0.9f,
+		};
+		selectionBox.anchorMiddle();
+
+		timeSave = Clock::getTicksSinceStart();
+
+		isRunning = true;
+	}
 
 	void handleEvents()
 	{
