@@ -19,10 +19,10 @@ class Game {
 public:
 	Game()
 	{
-		reset();
+		init();
 	}
 
-	void reset()
+	void init()
 	{
 		sdl::init(InitFlag::Video);
 
@@ -111,6 +111,12 @@ public:
 	void quit()
 	{
 		sdl::quit();
+	}
+
+	void reset()
+	{
+		quit();
+		init();
 	}
 
 private:
