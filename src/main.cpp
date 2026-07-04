@@ -30,67 +30,105 @@ auto unwrapOrExit(std::expected<T, std::string> maybe) -> T
 	return std::move(*maybe);
 }
 
-int main()
-{
-	init(InitFlag::Video);
+class Desktop {
+public:
+	Desktop() = default;
 
-	constexpr Vec<float, 2> WINDOW_SIZE { .x = 1280, .y = 720 };
-	auto window = unwrapOrExit(Window::create("FreeWare", WINDOW_SIZE));
-	auto renderer = unwrapOrExit(Renderer::create(window));
+	Desktop(const Vec<float, 2> windowSize, const float _aspectRatio)
+		: aspectRatio{_aspectRatio}, rect{initRect(windowSize, _aspectRatio)} {}
 
-	std::unordered_map<std::string, Texture> texturePool;
-	texturePool.insert({"desktop", unwrapOrExit(renderer.loadTexture("./assets/Windows_XP_Wallpaper.png"))});
-	texturePool.insert({"app_vim", unwrapOrExit(renderer.loadTexture("./assets/Vim.png"))});
+	void setTexture(Texture* _texture)
+	{
+		texture = _texture;
+	}
 
-	constexpr float aspectRatio = 4.0f / 3.0f;
-	const float desktopWidth = WINDOW_SIZE.y * aspectRatio;
-	const Rect<float> desktopRect = {
-		.position = {
-			.x = (WINDOW_SIZE.x - desktopWidth) / 2.0f,
-			.y = 0,
-		},
-		.size = {
-			.x = desktopWidth,
-			.y = WINDOW_SIZE.y,
-		},
-	};
+	auto getRect() const -> const Rect<float>&
+	{
+		return rect;
+	}
 
-	Sprite appPreview{texturePool.at("app_vim"), {
-		.size {
-			.x = 70.0f,
-			.y = 70.0f,
-		},
-	}};
-	appPreview.anchorCenter();
+	void render(Renderer& renderer) const
+	{
+		renderer.render(*texture, rect);
+	}
 
-	constexpr float appPadding = 40.0f;
-	Vec<float, 2> appTarget;
+private:
+	float aspectRatio;
+	Rect<float> rect;
+	Texture* texture;
 
-	const float gridLength = appPreview.getSize().x + appPadding;
-	Grid<8, 6> grid;
-	grid.size = {
-		.x = gridLength,
-		.y = gridLength,
-	};
-	grid.position = {
-		.x = desktopRect.position.x,
-		.y = 0.0f,
-	};
+	[[nodiscard]] static auto initRect(const Vec<float, 2> windowSize, const float _aspectRatio)
+		-> Rect<float>
+	{
+		const float width = windowSize.y * _aspectRatio;
+		return {
+			.position = {
+				.x = (windowSize.x - width) / 2.0f,
+				.y = 0,
+			},
+			.size = {
+				.x = width,
+				.y = windowSize.y,
+			},
+		};
+	}
+};
 
-	Rect<float> selectionBox = {
-		.size = grid.size * 0.9f,
-	};
-	selectionBox.anchorMiddle();
+class Game {
+public:
+	Game()
+	{
+		reset();
+	}
 
-	std::vector<Sprite> apps;
-	apps.reserve(grid.TILE_COUNT);
+	void reset()
+	{
+		sdl::init(InitFlag::Video);
 
-	Event event;
-	bool isRunning = true;
+		constexpr Vec<float, 2> WINDOW_SIZE { .x = 1280, .y = 720 };
+		window = unwrapOrExit(Window::create("FreeWare", WINDOW_SIZE));
+		renderer = unwrapOrExit(Renderer::create(window));
 
-	std::uint64_t timeSave = Clock::getTicksSinceStart();
+		texturePool.insert({"desktop", unwrapOrExit(renderer.loadTexture("./assets/Windows_XP_Wallpaper.png"))});
+		texturePool.insert({"app_vim", unwrapOrExit(renderer.loadTexture("./assets/Vim.png"))});
 
-	while (isRunning) {
+		desktop = Desktop{WINDOW_SIZE, 4.0f / 3.0f};
+		desktop.setTexture(&texturePool.at("desktop"));
+
+		appPreview = Sprite{texturePool.at("app_vim"), { .size { .x = 70.0f, .y = 70.0f }}};
+		appPreview.anchorCenter();
+
+		Vec<float, 2> appTarget;
+
+		const float gridLength = appPreview.getSize().x + APP_PADDING;
+		grid.size = {
+			.x = gridLength,
+			.y = gridLength,
+		};
+		grid.position = {
+			.x = desktop.getRect().position.x,
+			.y = 0.0f,
+		};
+		apps.reserve(grid.TILE_COUNT);
+
+		selectionBox = {
+			.size = grid.size * 0.9f,
+		};
+		selectionBox.anchorMiddle();
+
+
+		isRunning = true;
+
+		timeSave = Clock::getTicksSinceStart();
+	}
+
+	auto isFinished() -> bool
+	{
+		return not isRunning;
+	}
+
+	void update()
+	{
 		while (event.poll()) {
 			switch (event.getType()) {
 			case EventType::Quit:
@@ -123,7 +161,7 @@ int main()
 		float deltaTime = (float)(Clock::getTicksSinceStart() - timeSave) / (float)Clock::getFrequency();
 		timeSave = Clock::getTicksSinceStart();
 
-		renderer.render(texturePool.at("desktop"), desktopRect);
+		desktop.render(renderer);
 
 		Vec<float, 2> mousePos = getMouseState().position;
 
@@ -149,7 +187,41 @@ int main()
 		renderer.present();
 	}
 
-	quit();
+	void quit()
+	{
+		sdl::quit();
+	}
+
+private:
+	static constexpr float APP_PADDING = 40.0f;
+
+	Window window;
+	Renderer renderer;
+	Event event;
+
+	Desktop desktop;
+	Grid<8, 6> grid;
+	std::vector<Sprite> apps;
+
+	Vec<float, 2> appTarget;
+	Sprite appPreview;
+	Rect<float> selectionBox;
+
+	bool isRunning;
+	std::uint64_t timeSave;
+
+	std::unordered_map<std::string, Texture> texturePool;
+};
+
+int main()
+{
+	Game game;
+
+	while (not game.isFinished()) {
+		game.update();
+	}
+
+	game.quit();
 
 	return MainResult::Ok;
 }

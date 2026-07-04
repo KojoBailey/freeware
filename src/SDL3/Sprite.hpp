@@ -9,8 +9,10 @@ namespace sdl {
 
 class Sprite {
 public:
+	Sprite() = default;
+
 	Sprite(Texture& _texture, const Rect<float>& _rect)
-		: texture{_texture}, rect{_rect} {}
+		: texture{&_texture}, rect{_rect} {}
 
 	auto getSdlFRect() const -> SDL_FRect
 	{
@@ -19,7 +21,7 @@ public:
 
 	auto getSdlTexture() -> SDL_Texture*
 	{
-		return texture.get();
+		return texture->get();
 	}
 
 	[[nodiscard]] constexpr auto getSize() const -> Vec<float, 2>
@@ -71,7 +73,7 @@ public:
 	}
 
 private:
-	Texture& texture;
+	Texture* texture;
 	Rect<float> rect;
 
 	Clock clock;
