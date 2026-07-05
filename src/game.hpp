@@ -72,6 +72,17 @@ public:
 			renderer.fillRect(selectionBox);
 		}
 
+		Rect<float> firewall = desktop.getRect();
+		firewall.size.x = 60.0f;
+		renderer.setDrawColor(255, 150, 22);
+		renderer.fillRect(firewall);
+
+		Rect<float> bottomBar = desktop.getRect();
+		bottomBar.position.y = bottomBar.size.y - 30.0f;
+		bottomBar.size.y = 30.0f;
+		renderer.setDrawColor(32, 89, 215);
+		renderer.fillRect(bottomBar);
+
 		renderer.render(appPreview);
 
 		renderer.present();
@@ -89,14 +100,14 @@ public:
 	}
 
 private:
-	static constexpr float APP_PADDING = 40.0f;
+	static constexpr Vec<float, 2> APP_PADDING = {45.0f, 35.0f};
 
 	Window window;
 	Renderer renderer;
 	Event event;
 
 	Desktop desktop;
-	Grid<8, 5> grid;
+	Grid<8, 7> grid;
 	std::vector<Sprite> apps;
 
 	Vec<float, 2> appTarget;
@@ -124,24 +135,23 @@ private:
 		desktop = Desktop{WINDOW_SIZE, 4.0f / 3.0f};
 		desktop.setTexture(&texturePool.at("desktop"));
 
-		appPreview = Sprite{texturePool.at("app_vim"), { .size { .x = 70.0f, .y = 70.0f }}};
+		appPreview = Sprite{texturePool.at("app_vim"), { .size { .x = 55.0f, .y = 55.0f }}};
 		appPreview.anchorCenter();
 
 		Vec<float, 2> appTarget;
 
-		const float gridLength = appPreview.getSize().x + APP_PADDING;
-		grid.size = {
-			.x = gridLength,
-			.y = gridLength,
-		};
+		grid.size = appPreview.getSize() + APP_PADDING;
 		grid.position = {
-			.x = desktop.getRect().position.x,
-			.y = 40.0f,
+			.x = desktop.getRect().position.x + 100.0f,
+			.y = 0.0f,
 		};
 		apps.reserve(grid.TILE_COUNT);
 
 		selectionBox = {
-			.size = grid.size * 0.9f,
+			.size = {
+				.x = appPreview.getSize().x + APP_PADDING.y * 0.9f,
+				.y = appPreview.getSize().x + APP_PADDING.y * 0.9f,
+			}
 		};
 		selectionBox.anchorMiddle();
 
@@ -164,8 +174,8 @@ private:
 							Rect<float>{
 								.position = appTarget,
 								.size {
-									.x = 70.0f,
-									.y = 70.0f,
+									.x = 55.0f,
+									.y = 55.0f,
 								},
 							}
 						};
