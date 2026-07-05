@@ -38,6 +38,10 @@ public:
 		const auto snapResult = grid.snap(mousePos);
 		if (snapResult.has_value()) {
 			appTarget = *snapResult + (grid.size / 2.0f);
+			shouldShowTarget = true;
+		} else {
+			appTarget = mousePos;
+			shouldShowTarget = false;
 		}
 		appPreview.changePos(((appTarget - appPreview.getPos()) * 8.0f) * deltaTime);
 		selectionBox.position = appTarget;
@@ -59,8 +63,14 @@ public:
 		}
 
 		renderer.setDrawBlendMode(BlendMode::Blend);
-		renderer.setDrawColor(255, 255, 255, 100);
-		renderer.fillRect(selectionBox);
+		if (grid.isTileFree(appTarget)) {
+			renderer.setDrawColor(255, 255, 255, 100);
+		} else {
+			renderer.setDrawColor(255, 60, 60, 100);
+		}
+		if (shouldShowTarget) {
+			renderer.fillRect(selectionBox);
+		}
 
 		renderer.render(appPreview);
 
@@ -92,6 +102,7 @@ private:
 	Vec<float, 2> appTarget;
 	Sprite appPreview;
 	Rect<float> selectionBox;
+	bool shouldShowTarget;
 
 	bool isRunning;
 	std::uint64_t timeSave;
