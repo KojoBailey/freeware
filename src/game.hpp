@@ -96,7 +96,7 @@ private:
 	Event event;
 
 	Desktop desktop;
-	Grid<8, 6> grid;
+	Grid<8, 5> grid;
 	std::vector<Sprite> apps;
 
 	Vec<float, 2> appTarget;
@@ -136,7 +136,7 @@ private:
 		};
 		grid.position = {
 			.x = desktop.getRect().position.x,
-			.y = 0.0f,
+			.y = 40.0f,
 		};
 		apps.reserve(grid.TILE_COUNT);
 
