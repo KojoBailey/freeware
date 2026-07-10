@@ -1,9 +1,7 @@
-#include "game.hpp"
+#include "Game.hpp"
 
 int main()
 {
-	Game game;
-
 	while (not game.isFinished()) {
 		game.update();
 		game.draw();

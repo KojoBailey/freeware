@@ -6,6 +6,11 @@
 
 using namespace sdl;
 
+enum class AppType {
+	Vim,
+	Paint,
+};
+
 class App {
 public:
 	constexpr float SIZE = 70.0f;

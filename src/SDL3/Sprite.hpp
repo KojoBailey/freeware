@@ -11,8 +11,8 @@ class Sprite {
 public:
 	Sprite() = default;
 
-	Sprite(Texture& _texture, const Rect<float>& _rect)
-		: texture{&_texture}, rect{_rect} {}
+	Sprite(Texture* _texture, const Rect<float>& _rect)
+		: texture{_texture}, rect{_rect} {}
 
 	auto getSdlFRect() const -> SDL_FRect
 	{

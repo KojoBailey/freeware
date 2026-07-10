@@ -1,6 +1,10 @@
+#ifndef MAIN_GAME_HPP
+#define MAIN_GAME_HPP
+
 #include "util.hpp"
 #include "desktop.hpp"
 #include "grid.hpp"
+#include "AppButton.hpp"
 
 #include "SDL3/Init.hpp"
 #include "SDL3/Window.hpp"
@@ -22,9 +26,14 @@ public:
 		init();
 	}
 
-	auto isFinished() -> bool
+	auto isFinished() const -> bool
 	{
 		return not isRunning;
+	}
+
+	auto getRenderer() const -> const Renderer&
+	{
+		return renderer;
 	}
 
 	void update()
@@ -56,7 +65,7 @@ public:
 		renderer.setDrawColor(0, 0, 0);
 		renderer.clear();
 
-		desktop.render(renderer);
+		desktop.draw();
 
 		for (Sprite& app : apps) {
 			renderer.render(app);
@@ -82,6 +91,8 @@ public:
 		bottomBar.size.y = 30.0f;
 		renderer.setDrawColor(32, 89, 215);
 		renderer.fillRect(bottomBar);
+
+		renderer.render(appButton.getSprite());
 
 		renderer.render(appPreview);
 
@@ -110,6 +121,8 @@ private:
 	Grid<8, 7> grid;
 	std::vector<Sprite> apps;
 
+	AppButton appButton;
+
 	Vec<float, 2> appTarget;
 	Sprite appPreview;
 	Rect<float> selectionBox;
@@ -131,12 +144,15 @@ private:
 
 		texturePool.insert({"desktop", unwrapOrExit(renderer.loadTexture("./assets/Windows_XP_Wallpaper.png"))});
 		texturePool.insert({"app_vim", unwrapOrExit(renderer.loadTexture("./assets/Vim.png"))});
+		texturePool.insert({"app_paint", unwrapOrExit(renderer.loadTexture("./assets/Paint.png"))});
 
 		desktop = Desktop{WINDOW_SIZE, 4.0f / 3.0f};
 		desktop.setTexture(&texturePool.at("desktop"));
 
-		appPreview = Sprite{texturePool.at("app_vim"), { .size { .x = 55.0f, .y = 55.0f }}};
+		appPreview = Sprite{&texturePool.at("app_paint"), { .size { .x = 55.0f, .y = 55.0f }}};
 		appPreview.anchorCenter();
+
+		appButton = AppButton{"Vim", &texturePool.at("app_vim")};
 
 		Vec<float, 2> appTarget;
 
@@ -170,7 +186,7 @@ private:
 			case EventType::MouseButtonDown:
 				if (event.getMouseButton().getButtonType() == MouseButtonType::Left) {
 					if (grid.isTileFree(appTarget)) {
-						Sprite app{texturePool.at("app_vim"),
+						Sprite app{&texturePool.at("app_vim"),
 							Rect<float>{
 								.position = appTarget,
 								.size {
@@ -183,6 +199,19 @@ private:
 						apps.push_back(app);
 						grid.occupyTile(appTarget);
 					}
+
+					const Vec<float, 2> mousePos = getMouseState().position;
+					if (mousePos.x >= appButton.getSprite().getPos().x
+						and mousePos.x <= (appButton.getSprite().getPos().x + appButton.getSprite().getSize().x)
+						and mousePos.y >= appButton.getSprite().getPos().y
+						and mousePos.y <= (appButton.getSprite().getPos().y + appButton.getSprite().getSize().y))
+					{
+						appButton.onClicked();
+						appPreview = Sprite{&texturePool.at("app_vim"), { .size { .x = 55.0f, .y = 55.0f }}};
+						appPreview.anchorCenter();
+						appPreview.setPos(mousePos);
+					}
+
 				}
 				break;
 			default: break;
@@ -191,3 +220,6 @@ private:
 	}
 };
 
+static Game game;
+
+#endif

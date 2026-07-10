@@ -1,3 +1,9 @@
+#ifndef MAIN_DESKTOP_HPP
+#define MAIN_DESKTOP_HPP
+
+#include "Game.hpp"
+#include "Drawable.hpp"
+
 #include "SDL3/Rect.hpp"
 #include "SDL3/Renderer.hpp"
 #include "SDL3/Texture.hpp"
@@ -22,9 +28,9 @@ public:
 		return rect;
 	}
 
-	void render(Renderer& renderer) const
+	void draw() const
 	{
-		renderer.render(*texture, rect);
+		game.getRenderer().render(*texture, rect);
 	}
 
 private:
@@ -49,3 +55,4 @@ private:
 	}
 };
 
+#endif
