@@ -30,7 +30,7 @@ public:
 
 	void draw() const
 	{
-		game.getRenderer().render(*texture, rect);
+		// game.getRenderer().render(*texture, rect);
 	}
 
 private:

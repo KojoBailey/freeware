@@ -1,13 +1,7 @@
 #include "Game.hpp"
 
-int main()
+fn main() -> int
 {
-	while (not game.isFinished()) {
-		game.update();
-		game.draw();
-	}
-
-	game.quit();
-
-	return MainResult::Ok;
+	Game::create()
+		.run();
 }

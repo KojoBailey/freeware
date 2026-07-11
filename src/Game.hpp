@@ -1,10 +1,4 @@
-#ifndef MAIN_GAME_HPP
-#define MAIN_GAME_HPP
-
-#include "util.hpp"
-#include "desktop.hpp"
-#include "grid.hpp"
-#include "AppButton.hpp"
+#pragma once
 
 #include "SDL3/Init.hpp"
 #include "SDL3/Window.hpp"
@@ -12,16 +6,46 @@
 #include "SDL3/Event.hpp"
 #include "SDL3/Clock.hpp"
 
+#include "util.hpp"
+#include "desktop.hpp"
+#include "grid.hpp"
+#include "AppButton.hpp"
+
 #include <cmath>
 #include <expected>
 #include <unordered_map>
 #include <vector>
 
-using namespace sdl;
+#include "ECS.hpp"
 
 class Game {
 public:
-	Game()
+	static fn create() -> Game
+	{
+		return Game{};
+	}
+
+	fn run() -> Void
+	{
+		init();
+
+		// while (not isFinished()) {
+		// 	update();
+		// 	draw();
+		// }
+		//
+		// quit();
+	}
+
+private:
+	fn init() -> Void
+	{
+	}
+};
+
+class Game2 {
+public:
+	Game2()
 	{
 		init();
 	}
@@ -219,7 +243,3 @@ private:
 		}
 	}
 };
-
-static Game game;
-
-#endif
