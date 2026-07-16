@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include "game_object.hpp"
 
 void GameEngine::run()
 {
@@ -20,10 +21,24 @@ void GameEngine::run()
 		renderer.setDrawColor(0, 0, 0);
 		renderer.clear();
 		
-		game->render(renderer);
+		for (RectRenderer& rectRenderer : rectRenderers) {
+			renderer.setDrawColor(rectRenderer.color);
+			SDL_FRect sdlFRect = {
+				.x = 20,
+				.y = 20,
+				.w = rectRenderer.size.x,
+				.h = rectRenderer.size.y,
+			};
+			SDL_RenderFillRect(renderer.get(), &sdlFRect);
+		}
 
 		renderer.draw();
 	}
 
 	SDL_Quit();
+}
+
+auto GameEngine::createGameObject() -> GameObject
+{
+	return GameObject{this};
 }

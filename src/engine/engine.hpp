@@ -4,7 +4,11 @@
 #include "i_game.hpp"
 #include "renderer.hpp"
 
+#include "rect_renderer.hpp"
+
 #include <SDL3/SDL_init.h>
+
+class GameObject;
 
 class GameEngine {
 public:
@@ -46,12 +50,22 @@ public:
 	
 	void run();
 	
+	auto createGameObject() -> GameObject;
+	
+	template<typename T>
+	auto registerComponent() -> T&
+	{
+		return rectRenderers.emplace_back();
+	}
+	
 private:
 	UniquePtr<IGame> game;
 	Window window;
     Renderer renderer;
 	
 	bool isRunning;
+	
+	Vector<RectRenderer> rectRenderers;
 	
 	GameEngine() = default;
 };
