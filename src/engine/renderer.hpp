@@ -7,6 +7,8 @@
 
 class Renderer {
 public:
+	RGB backgroundColor;
+
 	[[nodiscard]] static auto create(
 		Window& window, 
 		const char* name = nullptr
@@ -20,6 +22,7 @@ public:
 		U8 blue,
 		U8 alpha = SDL_ALPHA_OPAQUE
 	);
+	void setDrawColor(RGB rgb);
 
 	void clear();
 

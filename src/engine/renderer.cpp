@@ -28,6 +28,11 @@ void Renderer::setDrawColor(
 	SDL_SetRenderDrawColor(handle.get(), red, green, blue, alpha);
 }
 
+void Renderer::setDrawColor(RGB rgb)
+{
+	SDL_SetRenderDrawColor(handle.get(), rgb.red, rgb.green, rgb.blue, SDL_ALPHA_OPAQUE);
+}
+
 void Renderer::clear()
 {
 	SDL_RenderClear(handle.get());

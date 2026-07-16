@@ -15,8 +15,11 @@ void GameEngine::run()
 			}
 		}
 		
+		renderer.setDrawColor(0, 0, 0);
 		renderer.clear();
-		renderer.setDrawColor(200, 50, 50);
+		
+		game->render(renderer);
+
 		renderer.draw();
 	}
 

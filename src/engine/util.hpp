@@ -66,3 +66,8 @@ class Vec2 {
 public:
 	T x, y;
 };
+
+class RGB {
+public:
+	U8 red, green, blue;
+};
