@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL_init.h>
 
+#include <concepts>
 #include <cstdint>
 
 namespace sdl {
@@ -34,7 +35,7 @@ constexpr auto operator|=(ESubSystem& lhs, ESubSystem rhs) -> ESubSystem
 template<std::same_as<ESubSystem>... Args>
 void init(Args... flags)
 {
-	ESubSystem ored = (args | ...);
+	ESubSystem ored = (flags | ...);
 	SDL_InitSubSystem(static_cast<SDL_InitFlags>(ored));
 }
 

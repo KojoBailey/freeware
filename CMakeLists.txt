@@ -21,6 +21,9 @@ file(GLOB_RECURSE SOURCES src/*.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_link_libraries(${PROJECT_NAME} PRIVATE SDL3::SDL3 SDL3_image::SDL3_image)
+target_compile_options(${PROJECT_NAME} PRIVATE
+	-fmacro-prefix-map=${CMAKE_SOURCE_DIR}/src/=
+)
 
 # Copies assets next to binary on build.
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

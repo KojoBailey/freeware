@@ -3,7 +3,7 @@
 
 #include <SDL3_image/SDL_image.h>
 
-#include <filesystem>
+#include <memory>
 
 namespace sdl {
 

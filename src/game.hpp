@@ -12,11 +12,8 @@
 #include "AppButton.hpp"
 
 #include <cmath>
-#include <expected>
 #include <unordered_map>
 #include <vector>
-
-#include "ECS.hpp"
 
 class Game {
 public:
@@ -25,7 +22,7 @@ public:
 		return Game{};
 	}
 
-	fn run() -> Void
+	fn run() -> Nothing
 	{
 		init();
 
@@ -38,7 +35,7 @@ public:
 	}
 
 private:
-	fn init() -> Void
+	fn init() -> Nothing
 	{
 	}
 };

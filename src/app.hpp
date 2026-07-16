@@ -1,7 +1,7 @@
 #include "SDL3/Texture.hpp"
 #include "SDL3/Rect.hpp"
-#include "SDL3/Vec.hpp"
 
+#include <expected>
 #include <filesystem>
 
 using namespace sdl;
@@ -13,7 +13,7 @@ enum class AppType {
 
 class App {
 public:
-	constexpr float SIZE = 70.0f;
+	static constexpr float SIZE = 70.0f;
 
 	[[nodiscard]] auto create(const std::filesystem::path& texturePath)
 		-> std::expected<App, std::string>
