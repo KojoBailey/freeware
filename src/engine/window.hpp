@@ -9,7 +9,7 @@ class Window {
 public:
 	static auto create(
 		std::string_view title,
-		const Vec2<F32> size
+		const Vec2<I32> size
 	) -> Result<Window>;
     
 	auto get() const -> SDL_Window*;

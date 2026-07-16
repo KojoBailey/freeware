@@ -44,6 +44,9 @@ template<typename T>
 using Result = std::expected<T, String>;
 
 template<typename T>
+using Error = std::unexpected<T>;
+
+template<typename T>
 using Maybe = std::optional<T>;
 
 template<typename T>

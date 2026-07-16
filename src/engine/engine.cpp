@@ -1,13 +1,24 @@
 #include "engine.hpp"
 
-auto GameEngine::init(
-    StringView name,
-    Vec2<U32> windowSize
-) -> Result<GameEngine>
-{
-    return std::unexpected{ "oops" };
-}
-
 void GameEngine::run()
 {
+	isRunning = true;
+	
+	while (isRunning) {
+		SDL_Event event;
+		while (SDL_PollEvent(&event)) {
+			switch (event.type) {
+			case SDL_EVENT_QUIT:
+				isRunning = false;
+				break;
+			default: break;
+			}
+		}
+		
+		renderer.clear();
+		renderer.setDrawColor(200, 50, 50);
+		renderer.draw();
+	}
+
+	SDL_Quit();
 }

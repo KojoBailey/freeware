@@ -1,15 +1,13 @@
-// #include "game.hpp"
-
 #include "engine/engine.hpp"
+#include "game/game.hpp"
 
 auto main() -> CInt
 {
-	auto engine = UNWRAP_OR_EXIT(GameEngine::init(
+	UNWRAP_OR_EXIT(GameEngine::initGame<Game>(
 			"FreeWare",
 			{ 1280, 720 }
-	));
-
-	engine.run();
+	))
+		.run();
 	
 	return 0;
 }
