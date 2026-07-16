@@ -4,6 +4,8 @@ void GameEngine::run()
 {
 	isRunning = true;
 	
+	game->start(*this);
+	
 	while (isRunning) {
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
