@@ -5,5 +5,5 @@
 class GameObjectHandle {
 public:
 	U32 index;
-	U32 generation;
+	U32 generation = 0;
 };

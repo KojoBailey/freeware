@@ -11,5 +11,5 @@ public:
 	
 	virtual void start(GameEngine& engine) = 0;
 
-    virtual void update(F32 deltaTime) = 0;
+    virtual void update(F64 deltaTime) = 0;
 };

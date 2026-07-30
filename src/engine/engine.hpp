@@ -71,6 +71,8 @@ private:
     Renderer renderer;
 	
 	bool isRunning;
+
+	U32 lastEntityIndex = 0;
 	
 	HashMap<std::type_index, UniquePtr<IComponentPool>> componentPools;
 	

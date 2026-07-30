@@ -68,6 +68,32 @@ template<typename T>
 class Vec2 {
 public:
 	T x, y;
+
+	auto operator+=(const Vec2<T>&& other) -> Vec2<T>&
+	{
+		x += other.x;
+		y += other.y;
+		return *this;
+	}
+
+	friend auto operator+(Vec2 copy, const Vec2<T>&& other) -> Vec2<T>
+	{
+		copy += other;
+		return copy;
+	}
+
+	auto operator+=(const T&& u) -> Vec2<T>&
+	{
+		x += u;
+		y += u;
+		return *this;
+	}
+
+	friend auto operator+(Vec2 copy, const T&& u) -> Vec2<T>
+	{
+		copy += u;
+		return copy;
+	}
 };
 
 class RGB {
