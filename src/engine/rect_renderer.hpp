@@ -1,4 +1,6 @@
-#include "util.hpp"
+#pragma once
+
+#include "pch.hpp"
 
 class RectRenderer {
 public:

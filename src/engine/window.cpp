@@ -1,7 +1,7 @@
 #include "window.hpp"
 
 auto Window::create(
-	std::string_view title,
+	StringView title,
 	const Vec2<I32> size
 ) -> Result<Window>
 {

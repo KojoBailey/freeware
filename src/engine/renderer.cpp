@@ -2,8 +2,8 @@
 
 auto Renderer::create(
 	Window& window, 
-	const char* name
-) -> std::expected<Renderer, std::string>
+	const Char* name
+) -> Result<Renderer>
 {
 	Renderer result;
 	result.handle.reset(SDL_CreateRenderer(window.get(), name));

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "util.hpp"
+#include "pch.hpp"
 #include "window.hpp"
 
 #include <SDL3/SDL_render.h>
@@ -12,7 +12,7 @@ public:
 	[[nodiscard]] static auto create(
 		Window& window, 
 		const char* name = nullptr
-	) -> std::expected<Renderer, std::string>;
+	) -> Result<Renderer>;
 
 	auto get() const -> SDL_Renderer*;
 

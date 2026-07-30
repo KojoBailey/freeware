@@ -1,12 +1,13 @@
 #pragma once
 
-#include "util.hpp"
+#include "pch.hpp"
 #include "i_game.hpp"
 #include "renderer.hpp"
-
-#include "rect_renderer.hpp"
+#include "component_pool.hpp"
 
 #include <SDL3/SDL_init.h>
+
+#include <typeindex>
 
 class GameObject;
 
@@ -32,13 +33,13 @@ public:
 		SDL_InitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
 		
 		auto maybeWindow = Window::create(name, windowSize);
-		if (!maybeWindow.has_value()) {
+		if (not maybeWindow.has_value()) {
 			return Error(maybeWindow.error());
 		}
 		result.window = std::move(*maybeWindow);
 
 		auto maybeRenderer = Renderer::create(result.window);
-		if (!maybeRenderer.has_value()) {
+		if (not maybeRenderer.has_value()) {
 			return Error(maybeRenderer.error());
 		}
 		result.renderer = std::move(*maybeRenderer);
@@ -48,15 +49,21 @@ public:
 		return result;
 	}
 	
-	void run();
+	auto run() -> Result<Nothing>;
+	
+	template<typename TComponent>
+	auto getPool() -> ComponentPool<TComponent>&
+	{
+		auto type = std::type_index(typeid(TComponent));
+		auto it = componentPools.find(type);
+		if (it == componentPools.end()) {
+			auto [inserted, ok] = componentPools.emplace(type, std::make_unique<ComponentPool<TComponent>>());
+			it = inserted;
+		}
+		return static_cast<ComponentPool<TComponent>&>(*it->second);
+	}
 	
 	auto createGameObject() -> GameObject;
-	
-	template<typename T>
-	auto registerComponent() -> T&
-	{
-		return rectRenderers.emplace_back();
-	}
 	
 private:
 	UniquePtr<IGame> game;
@@ -65,7 +72,7 @@ private:
 	
 	bool isRunning;
 	
-	Vector<RectRenderer> rectRenderers;
+	HashMap<std::type_index, UniquePtr<IComponentPool>> componentPools;
 	
 	GameEngine() = default;
 };
