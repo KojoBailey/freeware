@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <expected>
+#include <filesystem>
 #include <memory>
 #include <optional>
 #include <print> // IWYU pragma: keep
@@ -42,6 +43,8 @@ using F64 = double;
 
 using String = std::string;
 using StringView = std::string_view;
+
+using FilePath = std::filesystem::path;
 
 template<typename T>
 using Result = std::expected<T, String>;

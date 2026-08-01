@@ -4,6 +4,7 @@
 #include "i_game.hpp"
 #include "renderer.hpp"
 #include "component_pool.hpp"
+#include "texture.hpp"
 
 #include <SDL3/SDL_init.h>
 
@@ -64,6 +65,8 @@ public:
 	}
 	
 	auto createGameObject() -> GameObject;
+
+	auto createTexture(const FilePath& path) -> Result<Texture>;
 	
 private:
 	UniquePtr<IGame> game;

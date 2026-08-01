@@ -3,12 +3,15 @@
 
 class Game : public IGame {
 public:
-	void start(GameEngine& engine) override;
+	auto start(GameEngine& engine) -> Result<Nothing> override;
 
-    void update(F64 deltaTime) override;
+    auto update(F64 deltaTime) -> Result<Nothing> override;
 
 private:
 	F64 timeElapsed;
 
+	GameObject background;
 	Vector<GameObject> apps;
+
+	SharedPtr<Texture> vimTexture;
 };

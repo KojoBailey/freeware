@@ -7,14 +7,14 @@ auto main() -> CInt
 		{ .x = 1280, .y = 720 }
 	);
 	if (not maybeEngine.has_value()) {
-		std::println(stderr, "GameEngine initialisation error:\n\t{}", maybeEngine.error());
+		std::println(stderr, "GameEngine initialisation error:\n  {}", maybeEngine.error());
 		return 1;
 	}
 	GameEngine engine = std::move(*maybeEngine);
 
 	auto result = engine.run();
 	if (not result.has_value()) {
-		std::println(stderr, "GameEngine runtime error:\n\t{}", result.error());
+		std::println(stderr, "GameEngine runtime error:\n  {}", result.error());
 		return 1;
 	}
 
