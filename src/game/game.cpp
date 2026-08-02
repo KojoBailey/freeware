@@ -1,7 +1,7 @@
 #include "game.hpp"
 
-#include "../engine/components/rect_renderer.hpp"
 #include "../engine/components/rect_transform.hpp"
+#include "../engine/components/rect_renderer.hpp"
 #include "../engine/components/texture_renderer.hpp"
 
 #include <cmath>
@@ -18,22 +18,22 @@ auto Game::start(GameEngine& engine) -> Result<Nothing> {
 		return Error{maybeVimTexture.error()};
 	}
 	background = engine.createGameObject();
-	auto& backgroundTransform = background.addComponent<RectTransform>();
-	backgroundTransform.size = { .x = 960, .y = 720 };
-	backgroundTransform.position = { .x = 160, .y = 0 };
-	auto& backgroundRenderer = background.addComponent<TextureRenderer>();
-	backgroundRenderer.texture = std::make_shared<Texture>(std::move(*maybeBackgroundTexture));
+	auto& backgroundTransform = background.addComponent<RectTransform>()
+		.withSize({ .x = 960, .y = 720 })
+		.withPosition({ .x = 160, .y = 0 });
+	auto& backgroundRenderer = background.addComponent<TextureRenderer>()
+		.withTexture(std::make_shared<Texture>(std::move(*maybeBackgroundTexture)));
 
 	apps.reserve(5);
 	for (USz i = 0; i < 5; i++) {
 		auto& app = apps.emplace_back(engine.createGameObject());
 
-		auto& rectTransform = app.addComponent<RectTransform>();
-		rectTransform.size = { .x = 70, .y = 70 };
-		rectTransform.position = { .x = 200, .y = 20 + (F32)i * 120 };
+		auto& rectTransform = app.addComponent<RectTransform>()
+			.withSize({ .x = 70, .y = 70 })
+			.withPosition({ .x = 200, .y = 20 + (F32)i * 120 });
 
-		auto& textureRenderer = app.addComponent<TextureRenderer>();
-		textureRenderer.texture = vimTexture;
+		auto& textureRenderer = app.addComponent<TextureRenderer>()
+			.withTexture(vimTexture);
 	}
 
 	timeElapsed = 0.0;
