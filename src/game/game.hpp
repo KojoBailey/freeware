@@ -2,6 +2,7 @@
 #include "../engine/game_object.hpp"
 
 #include "background.hpp"
+#include "app.hpp"
 
 class Game : public IGame {
 public:
@@ -13,7 +14,7 @@ private:
 	F64 timeElapsed;
 
 	Background background;
-	Vector<GameObject> apps;
+	Vector<App> apps;
 
 	SharedPtr<Texture> vimTexture;
 };
