@@ -1,6 +1,8 @@
 #include "../engine/engine.hpp"
 #include "../engine/game_object.hpp"
 
+#include "background.hpp"
+
 class Game : public IGame {
 public:
 	auto start(GameEngine& engine) -> Result<Nothing> override;
@@ -10,7 +12,7 @@ public:
 private:
 	F64 timeElapsed;
 
-	GameObject background;
+	Background background;
 	Vector<GameObject> apps;
 
 	SharedPtr<Texture> vimTexture;
