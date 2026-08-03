@@ -70,6 +70,9 @@ public:
 		return *this;
 	}
 
+	// TODO: Clean up resources on destruction.
+	~GameObject() = default;
+
 	template<typename TComponent, typename... Args>
 	auto addComponent(Args&&... componentArgs) -> TComponent&
 	{

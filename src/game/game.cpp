@@ -23,7 +23,7 @@ auto Game::init(GameEngine& engine) -> Result<Nothing> {
 		app.changeY((F32)i * 120);
 	}
 
-	// appPreview = appTemplate;
+	appPreview = appTemplate;
 
 	timeElapsed = 0.0;
 
@@ -37,7 +37,7 @@ auto Game::update(GameEngine& engine, F64 deltaTime) -> Result<Nothing> {
 		app.update(deltaTime);
 	}
 
-	// appPreview.setPosition(engine.getMousePosition());
+	appPreview.setPosition(engine.getMousePosition());
 
 	return {};
 }
