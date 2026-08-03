@@ -39,7 +39,7 @@ public:
 			ComponentPool& pool;
 			USz index;
 			
-			auto operator!=(const Iterator& other) -> Bool const { return index != other.index; }
+			auto operator!=(const Iterator& other) -> Bool { return index != other.index; }
 			void operator++() { ++index; }
 			auto operator*()
 			{

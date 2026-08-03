@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bitset>
 #include <cstdint>
 #include <expected>
 #include <filesystem>
@@ -54,6 +55,9 @@ using Error = std::unexpected<T>;
 
 template<typename T>
 using Maybe = std::optional<T>;
+
+template<std::size_t N>
+using Bitset = std::bitset<N>;
 
 template<typename T>
 using Vector = std::vector<T>;

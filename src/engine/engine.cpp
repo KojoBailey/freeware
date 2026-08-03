@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include "SDL3/SDL_mouse.h"
 #include "game_object.hpp"
 #include "components/rect_transform.hpp"
 #include "components/rect_renderer.hpp"
@@ -10,7 +11,7 @@ auto GameEngine::run() -> Result<Nothing>
 {
 	isRunning = true;
 	
-	auto startResult = game->start(*this);
+	auto startResult = game->init(*this);
 	if (not startResult.has_value()) {
 		return Error(startResult.error());
 	}
@@ -32,7 +33,7 @@ auto GameEngine::run() -> Result<Nothing>
 		U64 currentClock = SDL_GetPerformanceCounter();
 		F64 deltaTime = (F64)(currentClock - lastClock) / (F64)clockFrequency;
 		lastClock = currentClock;
-		auto updateResult = game->update(deltaTime);
+		auto updateResult = game->update(*this, deltaTime);
 		if (not updateResult.has_value()) {
 			return Error(updateResult.error());
 		}
@@ -86,7 +87,19 @@ auto GameEngine::createGameObject() -> GameObject
 	return GameObject{this, lastEntityIndex++};
 }
 
+auto GameEngine::registerGameObject() -> U32
+{
+	return lastEntityIndex++;
+}
+
 auto GameEngine::createTexture(const FilePath& path) -> Result<Texture>
 {
 	return Texture::create(renderer, path);
+}
+
+auto GameEngine::getMousePosition() -> Vec2<F32>
+{
+	Vec2<F32> mousePosition;
+	auto _ = SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
+	return mousePosition;
 }

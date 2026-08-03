@@ -9,7 +9,7 @@ class IGame {
 public:
 	virtual ~IGame() = default;
 	
-	virtual auto start(GameEngine& engine) -> Result<Nothing> = 0;
+	virtual auto init(GameEngine& engine) -> Result<Nothing> = 0;
 
-    virtual auto update(F64 deltaTime) -> Result<Nothing> = 0;
+    virtual auto update(GameEngine& engine, F64 deltaTime) -> Result<Nothing> = 0;
 };

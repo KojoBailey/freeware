@@ -10,13 +10,15 @@ auto App::create(GameEngine& engine, AppType type, SharedPtr<Texture> texture) -
 {
 	App result;
 
+	result.type = type;
+
 	result.object = engine.createGameObject();
 
-	auto& rectTransform = result.object.addComponent<RectTransform>()
+	result.object.addComponent<RectTransform>()
 		.withSize({ .x = 70, .y = 70 })
 		.withPosition({ .x = 200, .y = 20 });
 
-	auto& textureRenderer = result.object.addComponent<TextureRenderer>()
+	result.object.addComponent<TextureRenderer>()
 		.withTexture(texture);
 
 	return result;
@@ -25,6 +27,13 @@ auto App::create(GameEngine& engine, AppType type, SharedPtr<Texture> texture) -
 auto App::getType() const -> AppType
 {
 	return type;
+}
+
+void App::setPosition(Vec2<F32> position)
+{
+	auto* rectTransform = object.getComponent<RectTransform>();
+	assert(rectTransform != nullptr);
+	rectTransform->position = position;
 }
 
 void App::changeY(F32 offset)

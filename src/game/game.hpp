@@ -1,20 +1,21 @@
 #include "../engine/engine.hpp"
-#include "../engine/game_object.hpp"
 
-#include "background.hpp"
+#include "wallpaper.hpp"
 #include "app.hpp"
 
 class Game : public IGame {
 public:
-	auto start(GameEngine& engine) -> Result<Nothing> override;
+	auto init(GameEngine& engine) -> Result<Nothing> override;
 
-    auto update(F64 deltaTime) -> Result<Nothing> override;
+    auto update(GameEngine& engine, F64 deltaTime) -> Result<Nothing> override;
 
 private:
 	F64 timeElapsed;
 
-	Background background;
+	Wallpaper wallpaper;
 	Vector<App> apps;
+
+	App appPreview;
 
 	SharedPtr<Texture> vimTexture;
 };

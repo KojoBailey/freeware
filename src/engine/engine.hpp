@@ -65,8 +65,11 @@ public:
 	}
 	
 	auto createGameObject() -> GameObject;
+	auto registerGameObject() -> U32;
 
 	auto createTexture(const FilePath& path) -> Result<Texture>;
+
+	auto getMousePosition() -> Vec2<F32>;
 	
 private:
 	UniquePtr<IGame> game;

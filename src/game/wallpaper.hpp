@@ -1,6 +1,6 @@
 #include "../engine/engine.hpp"
 
-class Background {
+class Wallpaper {
 public:
 	auto init(GameEngine& engine) -> Result<Nothing>;
 };
