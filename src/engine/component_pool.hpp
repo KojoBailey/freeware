@@ -32,6 +32,17 @@ public:
 	{
 		return handleToComponent.contains(handle.index);
 	}
+
+	void remove(GameObjectHandle handle)
+	{
+		USz targetIndex = handleToComponent.at(handle.index);
+		USz lastElement = components.size() - 1;
+		components[targetIndex] = std::move(components[lastElement]);
+		auto newHandle = componentToHandle[lastElement];
+		componentToHandle[targetIndex] = newHandle;
+		handleToComponent[newHandle.index] = targetIndex;
+		components.pop_back();
+	}
 	
 	auto toIter()
 	{

@@ -12,66 +12,11 @@ class GameObject {
 
 public:
 	GameObject() = default;
-
-	GameObject(const GameObject& other)
-		: engine{other.engine}
-	{
-		// TODO: Probably make use of assignment overload.
-		handle.index = engine->registerGameObject();
-		handle.generation = 0;
-
-		componentChecklist = other.componentChecklist;
-
-		for (USz i = 0; i < componentChecklist.size(); i++) {
-			bool hasComponentT = componentChecklist[i];
-			if (not hasComponentT) {
-				continue;
-			}
-
-			switch (i) {
-			case ComponentIndex<RectTransform>::value:
-				copyComponent<RectTransform>(*other.getComponent<RectTransform>());
-				break;
-			case ComponentIndex<RectRenderer>::value:
-				copyComponent<RectRenderer>(*other.getComponent<RectRenderer>());
-				break;
-			case ComponentIndex<TextureRenderer>::value:
-				copyComponent<TextureRenderer>(*other.getComponent<TextureRenderer>());
-				break;
-			}
-		}
-	}
-
-	auto operator=(const GameObject& other) -> GameObject&
-	{
-		if (this == &other) return *this;
-		// TODO: Remove existing components as well.
-		engine = other.engine;
-		handle.index = engine->registerGameObject();
-		componentChecklist = other.componentChecklist;
-		for (USz i = 0; i < componentChecklist.size(); i++) {
-			bool hasComponentT = componentChecklist[i];
-			if (not hasComponentT) {
-				continue;
-			}
-
-			switch (i) {
-			case ComponentIndex<RectTransform>::value:
-				copyComponent<RectTransform>(*other.getComponent<RectTransform>());
-				break;
-			case ComponentIndex<RectRenderer>::value:
-				copyComponent<RectRenderer>(*other.getComponent<RectRenderer>());
-				break;
-			case ComponentIndex<TextureRenderer>::value:
-				copyComponent<TextureRenderer>(*other.getComponent<TextureRenderer>());
-				break;
-			}
-		}
-		return *this;
-	}
-
-	// TODO: Clean up resources on destruction.
-	~GameObject() = default;
+	GameObject(const GameObject& other);
+	auto operator=(const GameObject& other) -> GameObject&;
+	GameObject(GameObject&& other);
+	auto operator=(GameObject&& other) -> GameObject&;
+	~GameObject();
 
 	template<typename TComponent, typename... Args>
 	auto addComponent(Args&&... componentArgs) -> TComponent&
@@ -85,6 +30,13 @@ public:
 	{
 		componentChecklist.set(ComponentIndex<TComponent>::value);
 		return engine->getPool<TComponent>().emplace(handle, component);
+	}
+
+	template<typename TComponent>
+	void removeComponent()
+	{
+		componentChecklist.reset(ComponentIndex<TComponent>::value);
+		engine->getPool<TComponent>().remove(handle);
 	}
 
 	template<typename TComponent>
@@ -105,9 +57,9 @@ private:
 
 	Bitset<3> componentChecklist{false};
 	
-	GameObject(GameEngine* _engine, U32 index)
-		: engine{_engine} 
-	{
-		handle.index = index;
-	}
+	GameObject(GameEngine* _engine, U32 index);
+
+	void removeAllComponents();
+
+	void copyAllComponents(const GameObject& other);
 };

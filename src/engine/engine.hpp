@@ -78,7 +78,8 @@ private:
 	
 	bool isRunning;
 
-	U32 lastEntityIndex = 0;
+	// NOTE: Start at 1 so that 0 is the empty handle.
+	U32 lastEntityIndex = 1;
 	
 	HashMap<std::type_index, UniquePtr<IComponentPool>> componentPools;
 	
