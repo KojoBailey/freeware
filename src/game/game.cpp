@@ -19,6 +19,7 @@ auto Game::init(GameEngine& engine) -> Result<Nothing> {
 	}
 	vimTexture = std::make_shared<Texture>(std::move(*maybeVimTexture));
 
+	// TODO: Make app preview translucent.
 	appPreview = engine.createGameObject();
 	appPreview.addComponent<RectTransform>()
 		.withSize({ .x = 70.0f, .y = 70.0f });
@@ -47,6 +48,7 @@ auto Game::init(GameEngine& engine) -> Result<Nothing> {
 auto Game::update(GameEngine& engine, F64 deltaTime) -> Result<Nothing> {
 	timeElapsed += deltaTime;
 
+	// TODO: Wrap appPreview in its own class.
 	auto* appPreviewTransform = appPreview.getComponent<RectTransform>();
 	assertValidPtr(appPreviewTransform);
 	const Vec2 mousePosition = engine.getMousePosition();
