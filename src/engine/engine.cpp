@@ -22,9 +22,15 @@ auto GameEngine::run() -> Result<Nothing>
 	while (isRunning) {
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
+			mIsMouseDown = false;
 			switch (event.type) {
 			case SDL_EVENT_QUIT:
 				isRunning = false;
+				break;
+			case SDL_EVENT_MOUSE_BUTTON_DOWN:
+				if (event.button.button == SDL_BUTTON_LEFT) {
+					mIsMouseDown = true;
+				}
 				break;
 			default: break;
 			}
@@ -102,4 +108,9 @@ auto GameEngine::getMousePosition() -> Vec2<F32>
 	Vec2<F32> mousePosition;
 	auto _ = SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
 	return mousePosition;
+}
+
+auto GameEngine::isMouseDown() -> Bool
+{
+	return mIsMouseDown;
 }

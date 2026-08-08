@@ -15,8 +15,7 @@ auto App::create(GameEngine& engine, AppType type, SharedPtr<Texture> texture) -
 	result.object = engine.createGameObject();
 
 	result.object.addComponent<RectTransform>()
-		.withSize({ .x = 70, .y = 70 })
-		.withPosition({ .x = 200, .y = 20 });
+		.withSize({ .x = 70, .y = 70 });
 
 	result.object.addComponent<TextureRenderer>()
 		.withTexture(texture);
@@ -29,18 +28,25 @@ auto App::getType() const -> AppType
 	return type;
 }
 
+auto App::getSize() const -> Vec2<F32>
+{
+	auto* rectTransform = object.getComponent<RectTransform>();
+	assert(rectTransform != nullptr);
+	return rectTransform->size;
+}
+
+auto App::getPosition() const -> Vec2<F32>
+{
+	auto* rectTransform = object.getComponent<RectTransform>();
+	assert(rectTransform != nullptr);
+	return rectTransform->position;
+}
+
 void App::setPosition(Vec2<F32> position)
 {
 	auto* rectTransform = object.getComponent<RectTransform>();
 	assert(rectTransform != nullptr);
 	rectTransform->position = position;
-}
-
-void App::changeY(F32 offset)
-{
-	auto* rectTransform = object.getComponent<RectTransform>();
-	assert(rectTransform != nullptr);
-	rectTransform->position.y += offset;
 }
 
 void App::update(F64 deltaTime)

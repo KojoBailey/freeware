@@ -1,2 +1,1 @@
-./build.sh
-./build-debug/FreeWare
+./build.sh && ./build-debug/FreeWare

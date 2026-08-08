@@ -1,4 +1,7 @@
 #include "game_object.hpp"
+#include "components/rect_transform.hpp"
+#include "components/rect_renderer.hpp"
+#include "components/texture_renderer.hpp"
 
 GameObject::GameObject(GameEngine* _engine, U32 index)
 	: engine{_engine} 
@@ -29,7 +32,7 @@ auto GameObject::operator=(const GameObject& other) -> GameObject&
 	return *this;
 }
 
-GameObject::GameObject(GameObject&& other)
+GameObject::GameObject(GameObject&& other) noexcept
 	: engine{other.engine}
 {
 	handle = other.handle; // NOTE: This passes ownership of all components.
@@ -37,7 +40,7 @@ GameObject::GameObject(GameObject&& other)
 	other.handle.deregister();
 }
 
-auto GameObject::operator=(GameObject&& other) -> GameObject&
+auto GameObject::operator=(GameObject&& other) noexcept -> GameObject&
 {
 	if (this == &other) return *this;
 	engine = other.engine;

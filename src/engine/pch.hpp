@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bitset>
+#include <cassert>
 #include <cstdint>
 #include <expected>
 #include <filesystem>
@@ -76,29 +77,81 @@ class Vec2 {
 public:
 	T x, y;
 
-	auto operator+=(const Vec2<T>&& other) -> Vec2<T>&
+	auto operator+=(const Vec2<T>& other) -> Vec2<T>&
 	{
 		x += other.x;
 		y += other.y;
 		return *this;
 	}
 
-	friend auto operator+(Vec2 copy, const Vec2<T>&& other) -> Vec2<T>
+	friend auto operator+(Vec2 copy, const Vec2<T>& other) -> Vec2<T>
 	{
 		copy += other;
 		return copy;
 	}
 
-	auto operator+=(const T&& u) -> Vec2<T>&
+	auto operator+=(const T& u) -> Vec2<T>&
 	{
 		x += u;
 		y += u;
 		return *this;
 	}
 
-	friend auto operator+(Vec2 copy, const T&& u) -> Vec2<T>
+	friend auto operator+(Vec2 copy, const T& u) -> Vec2<T>
 	{
 		copy += u;
+		return copy;
+	}
+
+	auto operator-=(const Vec2<T>& other) -> Vec2<T>&
+	{
+		x -= other.x;
+		y -= other.y;
+		return *this;
+	}
+
+	friend auto operator-(Vec2 copy, const Vec2<T>& other) -> Vec2<T>
+	{
+		copy -= other;
+		return copy;
+	}
+
+	auto operator-=(const T& u) -> Vec2<T>&
+	{
+		x -= u;
+		y -= u;
+		return *this;
+	}
+
+	friend auto operator-(Vec2 copy, const T& u) -> Vec2<T>
+	{
+		copy -= u;
+		return copy;
+	}
+
+	auto operator*=(const T& u) -> Vec2<T>&
+	{
+		x *= u;
+		y *= u;
+		return *this;
+	}
+
+	friend auto operator*(Vec2 copy, const T& u) -> Vec2<T>
+	{
+		copy *= u;
+		return copy;
+	}
+
+	auto operator/=(const T& u) -> Vec2<T>&
+	{
+		x /= u;
+		y /= u;
+		return *this;
+	}
+
+	friend auto operator/(Vec2 copy, const T& u) -> Vec2<T>
+	{
+		copy /= u;
 		return copy;
 	}
 };
@@ -107,3 +160,8 @@ class RGB {
 public:
 	U8 red, green, blue;
 };
+
+inline void assertValidPtr(const void* ptr)
+{
+	assert(ptr != nullptr);
+}

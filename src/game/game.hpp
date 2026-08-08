@@ -1,6 +1,7 @@
 #include "../engine/engine.hpp"
 
 #include "wallpaper.hpp"
+#include "grid.hpp"
 #include "app.hpp"
 
 class Game : public IGame {
@@ -13,9 +14,10 @@ private:
 	F64 timeElapsed;
 
 	Wallpaper wallpaper;
+	Grid<7, 6> grid;
 	Vector<App> apps;
 
-	App appPreview;
+	GameObject appPreview;
 
 	SharedPtr<Texture> vimTexture;
 };

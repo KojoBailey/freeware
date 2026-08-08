@@ -3,9 +3,6 @@
 #include "engine.hpp"
 #include "game_object_handle.hpp"
 #include "components/component_type.hpp"
-#include "components/rect_transform.hpp"
-#include "components/rect_renderer.hpp"
-#include "components/texture_renderer.hpp"
 
 class GameObject {
 	friend class GameEngine;
@@ -14,8 +11,8 @@ public:
 	GameObject() = default;
 	GameObject(const GameObject& other);
 	auto operator=(const GameObject& other) -> GameObject&;
-	GameObject(GameObject&& other);
-	auto operator=(GameObject&& other) -> GameObject&;
+	GameObject(GameObject&& other) noexcept;
+	auto operator=(GameObject&& other) noexcept -> GameObject&;
 	~GameObject();
 
 	template<typename TComponent, typename... Args>

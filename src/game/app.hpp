@@ -12,8 +12,10 @@ public:
 
 	auto getType() const -> AppType;
 
+	auto getSize() const -> Vec2<F32>;
+
+	auto getPosition() const -> Vec2<F32>;
 	void setPosition(Vec2<F32> position);
-	void changeY(F32 offset);
 	
 	void update(F64 deltaTime);
 

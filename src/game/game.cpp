@@ -1,29 +1,27 @@
 #include "game.hpp"
 
 auto Game::init(GameEngine& engine) -> Result<Nothing> {
-	if (auto wallpaperResult = wallpaper.init(engine); not wallpaperResult.has_value()) {
+	if (Result wallpaperResult = wallpaper.init(engine); not wallpaperResult.has_value()) {
 		return Error{wallpaperResult.error()};
 	}
 
-	auto maybeVimTexture = engine.createTexture("assets/Vim.png");
+	Result maybeGrid = decltype(grid)::create(engine);
+	if (not maybeGrid.has_value()) {
+		return Error{maybeGrid.error()};
+	}
+	grid = std::move(*maybeGrid);
+
+	Result maybeVimTexture = engine.createTexture("assets/Vim.png");
 	if (not maybeVimTexture.has_value()) {
 		return Error{maybeVimTexture.error()};
 	}
 	vimTexture = std::make_shared<Texture>(std::move(*maybeVimTexture));
 
-	auto maybeApp = App::create(engine, AppType::Vim, vimTexture);
-	if (not maybeApp.has_value()) {
-		return Error{maybeApp.error()};
-	}
-	auto appTemplate = std::move(*maybeApp);
-
-	apps.reserve(5);
-	for (USz i = 0; i < 5; i++) {
-		auto& app = apps.emplace_back(appTemplate);
-		app.changeY((F32)i * 120);
-	}
-
-	appPreview = appTemplate;
+	appPreview = engine.createGameObject();
+	appPreview.addComponent<RectTransform>()
+		.withSize({ .x = 70.0f, .y = 70.0f });
+	appPreview.addComponent<TextureRenderer>()
+		.withTexture(vimTexture);
 
 	timeElapsed = 0.0;
 
@@ -33,11 +31,31 @@ auto Game::init(GameEngine& engine) -> Result<Nothing> {
 auto Game::update(GameEngine& engine, F64 deltaTime) -> Result<Nothing> {
 	timeElapsed += deltaTime;
 
-	for (auto& app : apps) {
-		app.update(deltaTime);
+	auto* appPreviewTransform = appPreview.getComponent<RectTransform>();
+	assertValidPtr(appPreviewTransform);
+	const Vec2 mousePosition = engine.getMousePosition();
+	Vec2 tileIndex = grid.posToIndex(mousePosition);
+	Maybe snappedPosition = grid.snapToTileCenter(mousePosition);
+	if (snappedPosition.has_value()) {
+		appPreviewTransform->position = *snappedPosition;
+	} else {
+		appPreviewTransform->position = mousePosition;
+	}
+	appPreviewTransform->position -= appPreviewTransform->size / 2.0f;
+
+	if (engine.isMouseDown() and grid.isTileFree(tileIndex.x, tileIndex.y)) {
+		Result maybeApp = App::create(engine, AppType::Vim, vimTexture);
+		if (not maybeApp.has_value()) {
+			return Error{maybeApp.error()};
+		}
+		App& app = apps.emplace_back(std::move(*maybeApp));
+		app.setPosition(*grid.snapToTileCenter(tileIndex.x, tileIndex.y) - appPreview.getComponent<RectTransform>()->size / 2.0f);
+		grid.occupyTile(tileIndex.x, tileIndex.y);
 	}
 
-	appPreview.setPosition(engine.getMousePosition());
+	for (App& app : apps) {
+		app.update(deltaTime);
+	}
 
 	return {};
 }

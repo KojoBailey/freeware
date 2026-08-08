@@ -70,6 +70,7 @@ public:
 	auto createTexture(const FilePath& path) -> Result<Texture>;
 
 	auto getMousePosition() -> Vec2<F32>;
+	auto isMouseDown() -> Bool; // NOTE: Only detects left-click.
 	
 private:
 	UniquePtr<IGame> game;
@@ -82,6 +83,8 @@ private:
 	U32 lastEntityIndex = 1;
 	
 	HashMap<std::type_index, UniquePtr<IComponentPool>> componentPools;
+
+	bool mIsMouseDown{false};
 	
 	GameEngine() = default;
 };
