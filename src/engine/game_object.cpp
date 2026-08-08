@@ -43,6 +43,7 @@ GameObject::GameObject(GameObject&& other) noexcept
 auto GameObject::operator=(GameObject&& other) noexcept -> GameObject&
 {
 	if (this == &other) return *this;
+	removeAllComponents();
 	engine = other.engine;
 	handle = other.handle; // NOTE: This passes ownership of all components.
 	componentChecklist = other.componentChecklist;
