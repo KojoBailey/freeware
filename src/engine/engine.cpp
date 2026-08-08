@@ -50,7 +50,23 @@ auto GameEngine::run() -> Result<Nothing>
 		auto& rectTransforms = getPool<RectTransform>();
 		auto& rectRenderers = getPool<RectRenderer>();
 		auto& textureRenderers = getPool<TextureRenderer>();
+
+		// TODO: Implement render order system.
 		
+		for (auto [handle, textureRenderer] : textureRenderers.toIter()) {
+			RectTransform* rectTransform = rectTransforms.get(handle);
+			if (rectTransform == nullptr) {
+				return Error("Tried to render TextureRenderer for GameObject without a RectTransform.");
+			}
+			SDL_FRect sdlFRect = {
+				.x = rectTransform->position.x + textureRenderer.positionOffset.x,
+				.y = rectTransform->position.y + textureRenderer.positionOffset.y,
+				.w = rectTransform->size.x * textureRenderer.scale.x,
+				.h = rectTransform->size.y * textureRenderer.scale.y,
+			};
+			SDL_RenderTexture(renderer.get(), textureRenderer.texture->get(), nullptr, &sdlFRect);
+		}
+
 		for (auto [handle, rectRenderer] : rectRenderers.toIter()) {
 			RectTransform* rectTransform = rectTransforms.get(handle);
 			if (rectTransform == nullptr) {
@@ -64,20 +80,6 @@ auto GameEngine::run() -> Result<Nothing>
 				.h = rectTransform->size.y * rectRenderer.scale.y,
 			};
 			SDL_RenderFillRect(renderer.get(), &sdlFRect);
-		}
-
-		for (auto [handle, textureRenderer] : textureRenderers.toIter()) {
-			RectTransform* rectTransform = rectTransforms.get(handle);
-			if (rectTransform == nullptr) {
-				return Error("Tried to render TextureRenderer for GameObject without a RectTransform.");
-			}
-			SDL_FRect sdlFRect = {
-				.x = rectTransform->position.x + textureRenderer.positionOffset.x,
-				.y = rectTransform->position.y + textureRenderer.positionOffset.y,
-				.w = rectTransform->size.x * textureRenderer.scale.x,
-				.h = rectTransform->size.y * textureRenderer.scale.y,
-			};
-			SDL_RenderTexture(renderer.get(), textureRenderer.texture->get(), nullptr, &sdlFRect);
 		}
 
 		renderer.draw();

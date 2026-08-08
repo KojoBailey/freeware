@@ -14,7 +14,9 @@ private:
 	F64 timeElapsed;
 
 	Wallpaper wallpaper;
-	Grid<7, 6> grid;
+	GameObject firewall;
+	GameObject bottomBar;
+	Grid<8, 6> grid;
 	Vector<App> apps;
 
 	GameObject appPreview;

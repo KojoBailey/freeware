@@ -15,7 +15,7 @@ public:
 		result.object = engine.createGameObject();
 
 		result.object.addComponent<RectTransform>()
-			.withPosition({ .x = 20, .y = 20 });
+			.withPosition({ .x = 260, .y = 20 });
 
 		return result;
 	}

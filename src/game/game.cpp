@@ -1,5 +1,7 @@
 #include "game.hpp"
 
+#include "../engine/components/rect_renderer.hpp"
+
 auto Game::init(GameEngine& engine) -> Result<Nothing> {
 	if (Result wallpaperResult = wallpaper.init(engine); not wallpaperResult.has_value()) {
 		return Error{wallpaperResult.error()};
@@ -22,6 +24,20 @@ auto Game::init(GameEngine& engine) -> Result<Nothing> {
 		.withSize({ .x = 70.0f, .y = 70.0f });
 	appPreview.addComponent<TextureRenderer>()
 		.withTexture(vimTexture);
+
+	firewall = engine.createGameObject();
+	firewall.addComponent<RectTransform>()
+		.withPosition({ .x = 160, .y = 0 })
+		.withSize({ .x = 60.0f, .y = 720.0f });
+	firewall.addComponent<RectRenderer>()
+		.withColor({ .red = 255, .green = 150, .blue = 22 });
+
+	bottomBar = engine.createGameObject();
+	bottomBar.addComponent<RectTransform>()
+		.withPosition({ .x = 160, .y = 690.0f })
+		.withSize({ .x = 800.0f, .y = 30.0f });
+	bottomBar.addComponent<RectRenderer>()
+		.withColor({ .red = 32, .green = 89, .blue = 215 });
 
 	timeElapsed = 0.0;
 
