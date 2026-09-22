@@ -57,6 +57,9 @@ using Error = std::unexpected<T>;
 template<typename T>
 using Maybe = std::optional<T>;
 
+template<typename T>
+using Ref = std::reference_wrapper<T>;
+
 template<std::size_t N>
 using Bitset = std::bitset<N>;
 
@@ -65,6 +68,9 @@ using Vector = std::vector<T>;
 
 template<typename Key, typename Value>
 using HashMap = std::unordered_map<Key, Value>;
+
+template<typename A, typename B>
+using Pair = std::pair<A, B>;
 
 template<typename T, typename D = std::default_delete<T>>
 using UniquePtr = std::unique_ptr<T, D>;
@@ -160,8 +166,3 @@ class RGB {
 public:
 	U8 red, green, blue;
 };
-
-inline void assertValidPtr(const void* ptr)
-{
-	assert(ptr != nullptr);
-}

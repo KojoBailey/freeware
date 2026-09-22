@@ -49,17 +49,17 @@ auto Game::update(GameEngine& engine, F64 deltaTime) -> Result<Nothing> {
 	timeElapsed += deltaTime;
 
 	// TODO: Wrap appPreview in its own class.
-	auto* appPreviewTransform = appPreview.getComponent<RectTransform>();
-	assertValidPtr(appPreviewTransform);
+	Maybe appPreviewTransform = appPreview.getComponent<RectTransform>();
+	assert(appPreviewTransform.has_value());
 	const Vec2 mousePosition = engine.getMousePosition();
 	Vec2 tileIndex = grid.posToIndex(mousePosition);
 	Maybe snappedPosition = grid.snapToTileCenter(mousePosition);
 	if (snappedPosition.has_value()) {
-		appPreviewTransform->position = *snappedPosition;
+		appPreviewTransform->get().position = *snappedPosition;
 	} else {
-		appPreviewTransform->position = mousePosition;
+		appPreviewTransform->get().position = mousePosition;
 	}
-	appPreviewTransform->position -= appPreviewTransform->size / 2.0f;
+	appPreviewTransform->get().position -= appPreviewTransform->get().size / 2.0f;
 
 	if (engine.isMouseDown() and grid.isTileFree(tileIndex.x, tileIndex.y)) {
 		Result maybeApp = App::create(engine, AppType::Vim, vimTexture);
@@ -67,7 +67,8 @@ auto Game::update(GameEngine& engine, F64 deltaTime) -> Result<Nothing> {
 			return Error{maybeApp.error()};
 		}
 		App& app = apps.emplace_back(std::move(*maybeApp));
-		app.setPosition(*grid.snapToTileCenter(tileIndex.x, tileIndex.y) - appPreview.getComponent<RectTransform>()->size / 2.0f);
+		app.setPosition(*grid.snapToTileCenter(tileIndex.x, tileIndex.y)
+			- appPreview.getComponent<RectTransform>()->get().size / 2.0f);
 		grid.occupyTile(tileIndex.x, tileIndex.y);
 	}
 

@@ -37,13 +37,13 @@ public:
 	}
 
 	template<typename TComponent>
-	auto getComponent() -> TComponent*
+	auto getComponent() -> Maybe<Ref<TComponent>>
 	{
 		return engine->getPool<TComponent>().get(handle);
 	}
 
 	template<typename TComponent>
-	auto getComponent() const -> TComponent*
+	auto getComponent() const -> Maybe<Ref<TComponent>>
 	{
 		return engine->getPool<TComponent>().get(handle);
 	}

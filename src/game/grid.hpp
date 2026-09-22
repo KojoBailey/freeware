@@ -22,9 +22,9 @@ public:
 
 	auto getPos() const -> Vec2<F32>
 	{
-		const auto* rectTransform = object.getComponent<RectTransform>();
-		assertValidPtr(rectTransform);
-		return rectTransform->position;
+		const Maybe rectTransform = object.getComponent<RectTransform>();
+		assert(rectTransform.has_value());
+		return rectTransform->get().position;
 	}
 
 	auto getIndex(const I8 column, const I8 row) const -> USz

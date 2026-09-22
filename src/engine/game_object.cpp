@@ -6,14 +6,14 @@
 GameObject::GameObject(GameEngine* _engine, U32 index)
 	: engine{_engine} 
 {
-	handle.index = index;
+	handle.key = index;
 }
 
 GameObject::GameObject(const GameObject& other)
 	: engine{other.engine}
 {
 	handle = {
-		.index = engine->registerGameObject(),
+		.key = engine->registerGameObject(),
 	};
 	componentChecklist = other.componentChecklist;
 	copyAllComponents(other);
@@ -25,7 +25,7 @@ auto GameObject::operator=(const GameObject& other) -> GameObject&
 	removeAllComponents();
 	engine = other.engine;
 	handle = {
-		.index = engine->registerGameObject(),
+		.key = engine->registerGameObject(),
 	};
 	componentChecklist = other.componentChecklist;
 	copyAllComponents(other);
@@ -58,7 +58,7 @@ GameObject::~GameObject()
 
 void GameObject::removeAllComponents()
 {
-	if (handle.index == 0) return;
+	if (handle.key == 0) return;
 
 	for (USz i = 0; i < componentChecklist.size(); i++) {
 		bool hasComponentT = componentChecklist[i];

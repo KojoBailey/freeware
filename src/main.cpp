@@ -2,10 +2,10 @@
 
 auto main() -> CInt
 {
-	auto maybeEngine = GameEngine::initGame<Game>(
-		"FreeWare",
-		{ .x = 1280, .y = 720 }
-	);
+	auto maybeEngine = GameEngine::initGame<Game>({
+		.name = "FreeWare",
+		.windowSize = { .x = 1280, .y = 720 },
+	});
 	if (not maybeEngine.has_value()) {
 		std::println(stderr, "GameEngine initialisation error:\n  {}", maybeEngine.error());
 		return 1;

@@ -3,44 +3,51 @@
 #include "pch.hpp"
 #include "game_object_handle.hpp"
 
-class IComponentPool {
-public:
-	virtual ~IComponentPool() = default;
-};
+// NOTE: `ComponentPool<T>` is templated, and this is the best way to generically
+// store different instantiations of it, since `ComponentPool` alone doesn't suffice fsr.
+class IComponentPool {};
 
 template<typename TComponent>
 class ComponentPool : public IComponentPool {
 public:
-	auto emplace(GameObjectHandle handle, TComponent component) -> TComponent&
+	// WARN: Does not account for allocation failure.
+	auto emplace(
+		GameObjectHandle handle,
+		TComponent component
+	) -> TComponent&
 	{
-		USz newIndex = components.size();
-		handleToComponent[handle.index] = newIndex;
-		components.push_back(std::move(component));
-		componentToHandle.push_back(handle);
-		return components.back();
+		registerHandle(handle);
+		USz newComponentIndex = pushBackAndGetLastIndex(components, std::move(component));
+		componentIndexByHandle[handle.key] = newComponentIndex;
+		return components[newComponentIndex];
 	}
 	
-	auto get(GameObjectHandle handle) -> TComponent*
+	auto get(GameObjectHandle handle) -> Maybe<Ref<TComponent>>
 	{
-		auto it = handleToComponent.find(handle.index);
-		return it != handleToComponent.end()
-			? &components[it->second]
-			: nullptr;
+		// PERF: `unordered_map::at` throws an exception on no find which is costly.
+		// Hence, iterators must be used explicitly, even though the key is unimportant.
+		// NOTE: This would be cleaner if the STL had an `unordered_map::maybe_at` method
+		// that returned an `optional<T&>`.
+		auto iterator = componentIndexByHandle.find(handle.key);
+		if (not wasFindSuccessful(iterator, componentIndexByHandle))
+			return {};
+		auto& [key, componentIndex] = *iterator;
+		return components[componentIndex];
 	}
 	
-	auto has(GameObjectHandle handle) -> bool
+	auto has(GameObjectHandle handle) -> Bool
 	{
-		return handleToComponent.contains(handle.index);
+		return componentIndexByHandle.contains(handle.key);
 	}
 
 	void remove(GameObjectHandle handle)
 	{
-		USz targetIndex = handleToComponent.at(handle.index);
-		USz lastElement = components.size() - 1;
-		components[targetIndex] = std::move(components[lastElement]);
-		auto newHandle = componentToHandle[lastElement];
-		componentToHandle[targetIndex] = newHandle;
-		handleToComponent[newHandle.index] = targetIndex;
+		USz removalIndex = componentIndexByHandle.at(handle.key);
+		USz componentToMoveIndex = components.size() - 1;
+		components[removalIndex] = std::move(components[componentToMoveIndex]);
+		auto movedComponentHandle = handleByComponentIndex[componentToMoveIndex];
+		handleByComponentIndex[removalIndex] = movedComponentHandle;
+		componentIndexByHandle[movedComponentHandle.key] = removalIndex;
 		components.pop_back();
 	}
 	
@@ -54,7 +61,8 @@ public:
 			void operator++() { ++index; }
 			auto operator*()
 			{
-				return std::pair<GameObjectHandle&, TComponent&>(pool.componentToHandle[index], pool.components[index]);
+				return Pair<GameObjectHandle&, TComponent&>(
+					pool.handleByComponentIndex[index], pool.components[index]);
 			}
 		};
 		struct Range {
@@ -67,6 +75,33 @@ public:
 
 private:
 	Vector<TComponent> components;
-	Vector<GameObjectHandle> componentToHandle;
-	HashMap<U32, USz> handleToComponent;
+	Vector<GameObjectHandle> handleByComponentIndex;
+	HashMap<U32,USz> componentIndexByHandle;
+
+	// PERF: Calculating the index *before* pushing back to the vector
+	// avoids calculating subtraction with `vector.size() - 1`.
+	template<typename T>
+	auto pushBackAndGetLastIndex(
+		Vector<T>& vector,
+		const T& item
+	) -> USz
+	{
+		USz lastIndex = vector.size();
+		vector.push_back(std::move(item));
+		return lastIndex;
+	}
+
+	void registerHandle(GameObjectHandle handle)
+	{
+		handleByComponentIndex.push_back(handle);
+	}
+
+	template<typename Container, std::input_iterator Iterator>
+	auto wasFindSuccessful(
+		Iterator iterator,
+		const Container& container
+	) -> Bool
+	{
+		return iterator != container.end();
+	}
 };

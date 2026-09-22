@@ -30,30 +30,31 @@ auto App::getType() const -> AppType
 
 auto App::getSize() const -> Vec2<F32>
 {
-	auto* rectTransform = object.getComponent<RectTransform>();
-	assert(rectTransform != nullptr);
-	return rectTransform->size;
+	const Maybe rectTransform = object.getComponent<RectTransform>();
+	assert(rectTransform.has_value());
+	return rectTransform->get().size;
 }
 
 auto App::getPosition() const -> Vec2<F32>
 {
-	auto* rectTransform = object.getComponent<RectTransform>();
-	assert(rectTransform != nullptr);
-	return rectTransform->position;
+	const Maybe rectTransform = object.getComponent<RectTransform>();
+	assert(rectTransform.has_value());
+	return rectTransform->get().position;
 }
 
 void App::setPosition(Vec2<F32> position)
 {
-	auto* rectTransform = object.getComponent<RectTransform>();
-	assert(rectTransform != nullptr);
-	rectTransform->position = position;
+	Maybe rectTransform = object.getComponent<RectTransform>();
+	assert(rectTransform.has_value());
+	rectTransform->get().position = position;
 }
 
 void App::update(F64 deltaTime)
 {
-	auto* renderer = object.getComponent<TextureRenderer>();
-	assert(renderer != nullptr);
-	renderer->positionOffset.y = static_cast<F32>(std::sin((timeElapsed + 100) * 2.0) * 10.0);
+	Maybe renderer = object.getComponent<TextureRenderer>();
+	assert(renderer.has_value());
+	renderer->get().positionOffset.y = static_cast<F32>(
+		std::sin((timeElapsed + 100) * 2.0) * 10.0);
 
 	timeElapsed += deltaTime;
 }

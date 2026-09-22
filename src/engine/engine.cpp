@@ -54,30 +54,32 @@ auto GameEngine::run() -> Result<Nothing>
 		// TODO: Implement render order system.
 		
 		for (auto [handle, textureRenderer] : textureRenderers.toIter()) {
-			RectTransform* rectTransform = rectTransforms.get(handle);
-			if (rectTransform == nullptr) {
+			Maybe<Ref<RectTransform>> maybeRectTransform = rectTransforms.get(handle);
+			if (not maybeRectTransform.has_value()) {
 				return Error("Tried to render TextureRenderer for GameObject without a RectTransform.");
 			}
+			RectTransform& rectTransform = std::move(*maybeRectTransform);
 			SDL_FRect sdlFRect = {
-				.x = rectTransform->position.x + textureRenderer.positionOffset.x,
-				.y = rectTransform->position.y + textureRenderer.positionOffset.y,
-				.w = rectTransform->size.x * textureRenderer.scale.x,
-				.h = rectTransform->size.y * textureRenderer.scale.y,
+				.x = rectTransform.position.x + textureRenderer.positionOffset.x,
+				.y = rectTransform.position.y + textureRenderer.positionOffset.y,
+				.w = rectTransform.size.x * textureRenderer.scale.x,
+				.h = rectTransform.size.y * textureRenderer.scale.y,
 			};
 			SDL_RenderTexture(renderer.get(), textureRenderer.texture->get(), nullptr, &sdlFRect);
 		}
 
 		for (auto [handle, rectRenderer] : rectRenderers.toIter()) {
-			RectTransform* rectTransform = rectTransforms.get(handle);
-			if (rectTransform == nullptr) {
+			Maybe<Ref<RectTransform>> maybeRectTransform = rectTransforms.get(handle);
+			if (not maybeRectTransform.has_value()) {
 				return Error("Tried to render RectRenderer for GameObject without a RectTransform.");
 			}
+			RectTransform& rectTransform = std::move(*maybeRectTransform);
 			renderer.setDrawColor(rectRenderer.color);
 			SDL_FRect sdlFRect = {
-				.x = rectTransform->position.x + rectRenderer.positionOffset.x,
-				.y = rectTransform->position.y + rectRenderer.positionOffset.y,
-				.w = rectTransform->size.x * rectRenderer.scale.x,
-				.h = rectTransform->size.y * rectRenderer.scale.y,
+				.x = rectTransform.position.x + rectRenderer.positionOffset.x,
+				.y = rectTransform.position.y + rectRenderer.positionOffset.y,
+				.w = rectTransform.size.x * rectRenderer.scale.x,
+				.h = rectTransform.size.y * rectRenderer.scale.y,
 			};
 			SDL_RenderFillRect(renderer.get(), &sdlFRect);
 		}

@@ -22,10 +22,14 @@ public:
 
 	~GameEngine() = default;
 
+	struct InitGameParam {
+		StringView name;
+		Vec2<I32> windowSize;
+	};
+
 	template<std::derived_from<IGame> T, typename... Args>
 	static auto initGame(
-		StringView name,
-		Vec2<I32> windowSize,
+		InitGameParam args,
 		Args&&... gameArgs
 	) -> Result<GameEngine>
 	{
@@ -33,7 +37,7 @@ public:
 
 		SDL_InitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
 		
-		auto maybeWindow = Window::create(name, windowSize);
+		auto maybeWindow = Window::create(args.name, args.windowSize);
 		if (not maybeWindow.has_value()) {
 			return Error(maybeWindow.error());
 		}
