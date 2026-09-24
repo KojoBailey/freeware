@@ -1,7 +1,5 @@
 #include "game/game.hpp"
 
-#define TRY_OR_ERR(x , err_msg)
-
 auto main() -> CInt
 {
 	auto maybeEngine = GameEngine::create({
@@ -14,8 +12,7 @@ auto main() -> CInt
 	}
 	GameEngine engine = std::move(*maybeEngine);
 
-	Result result = engine.run<FreeWare>();
-	if (not result.has_value()) {
+	if (Result result = engine.run<FreeWare>(); not result.has_value()) {
 		std::println(stderr , "GameEngine runtime error:\n  {}" , result.error());
 		return 1;
 	}
