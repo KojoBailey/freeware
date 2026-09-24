@@ -26,114 +26,11 @@ public:
 
 	~GameEngine() = default;
 
-	static auto create(StringView title, Vec2<I32> windowSize) -> Result<GameEngine>
-	{
-		GameEngine result;
+	static auto create(StringView title, Vec2<I32> windowSize) -> Result<GameEngine>;
 
-		SDL_InitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
-		
-		auto maybeWindow = Window::create(title, windowSize);
-		if (not maybeWindow.has_value()) {
-			return Error(maybeWindow.error());
-		}
-		result.window = std::move(*maybeWindow);
-
-		auto maybeRenderer = Renderer::create(result.window);
-		if (not maybeRenderer.has_value()) {
-			return Error(maybeRenderer.error());
-		}
-		result.renderer = std::move(*maybeRenderer);
-		
-		return result;
-	}
+	auto load(UniquePtr<IGame> game) -> Result<Nothing>;
 	
-	template<std::derived_from<IGame> Game>
-	auto run() -> Result<Nothing>
-	{
-		this->game = std::make_unique<Game>();
-			
-		isRunning = true;
-		
-		auto startResult = game->init(*this);
-		if (not startResult.has_value()) {
-			return Error(startResult.error());
-		}
-
-		U64 clockFrequency = SDL_GetPerformanceFrequency();
-		U64 lastClock = SDL_GetPerformanceCounter();
-		
-		while (isRunning) {
-			SDL_Event event;
-			while (SDL_PollEvent(&event)) {
-				mIsMouseDown = false;
-				switch (event.type) {
-				case SDL_EVENT_QUIT:
-					isRunning = false;
-					break;
-				case SDL_EVENT_MOUSE_BUTTON_DOWN:
-					if (event.button.button == SDL_BUTTON_LEFT) {
-						mIsMouseDown = true;
-					}
-					break;
-				default: break;
-				}
-			}
-
-			U64 currentClock = SDL_GetPerformanceCounter();
-			F64 deltaTime = (F64)(currentClock - lastClock) / (F64)clockFrequency;
-			lastClock = currentClock;
-			auto updateResult = game->update(*this, deltaTime);
-			if (not updateResult.has_value()) {
-				return Error(updateResult.error());
-			}
-			
-			renderer.setDrawColor(0, 0, 0);
-			renderer.clear();
-			
-			auto& rectTransforms = getPool<RectTransform>();
-			auto& rectRenderers = getPool<RectRenderer>();
-			auto& textureRenderers = getPool<TextureRenderer>();
-
-			// TODO: Implement render order system.
-			
-			for (auto [handle, textureRenderer] : textureRenderers) {
-				Maybe<Ref<RectTransform>> maybeRectTransform = rectTransforms.get(handle);
-				if (not maybeRectTransform.has_value()) {
-					return Error("Tried to render TextureRenderer for GameObject without a RectTransform.");
-				}
-				RectTransform& rectTransform = std::move(*maybeRectTransform);
-				SDL_FRect sdlFRect = {
-					.x = rectTransform.position.x + textureRenderer.positionOffset.x,
-					.y = rectTransform.position.y + textureRenderer.positionOffset.y,
-					.w = rectTransform.size.x * textureRenderer.scale.x,
-					.h = rectTransform.size.y * textureRenderer.scale.y,
-				};
-				SDL_RenderTexture(renderer.get(), textureRenderer.texture->get(), nullptr, &sdlFRect);
-			}
-
-			for (auto [handle, rectRenderer] : rectRenderers) {
-				Maybe<Ref<RectTransform>> maybeRectTransform = rectTransforms.get(handle);
-				if (not maybeRectTransform.has_value()) {
-					return Error("Tried to render RectRenderer for GameObject without a RectTransform.");
-				}
-				RectTransform& rectTransform = std::move(*maybeRectTransform);
-				renderer.setDrawColor(rectRenderer.color);
-				SDL_FRect sdlFRect = {
-					.x = rectTransform.position.x + rectRenderer.positionOffset.x,
-					.y = rectTransform.position.y + rectRenderer.positionOffset.y,
-					.w = rectTransform.size.x * rectRenderer.scale.x,
-					.h = rectTransform.size.y * rectRenderer.scale.y,
-				};
-				SDL_RenderFillRect(renderer.get(), &sdlFRect);
-			}
-
-			renderer.draw();
-		}
-
-		SDL_Quit();
-		
-		return {};
-	}
+	auto run() -> Result<Nothing>;
 	
 	template<typename TComponent>
 	auto getPool() -> ComponentPool<TComponent>&
@@ -160,14 +57,12 @@ private:
 	Window window;
     Renderer renderer;
 	
-	bool isRunning;
-
 	// NOTE: Start at 1 so that 0 is the empty handle.
 	U32 lastEntityIndex = 1;
 	
 	HashMap<std::type_index, UniquePtr<IComponentPool>> componentPools;
 
-	bool mIsMouseDown{false};
+	Bool _isMouseDown{false};
 	
 	GameEngine() = default;
 };

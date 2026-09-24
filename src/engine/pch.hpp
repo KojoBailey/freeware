@@ -26,6 +26,28 @@
 		} \
 	})
 
+// WARN: This macro restricts compilation to GCC and Clang.
+// Otherwise usage would be `TRY(file_signature, data.read<str>(4));`
+template<typename Exp>
+decltype(auto) try_unwrap(Exp&& e) {
+    if constexpr (std::is_void_v<typename std::remove_reference_t<Exp>::value_type>)
+        return;
+    else
+        return std::move(*e);
+}
+#ifdef __clang__
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored "-Wgnu-statement-expression-from-macro-expansion"
+#elifdef __GNUC__
+#	pragma GCC diagnostic push
+#	pragma GCC diagnostic ignored "-Wgnu-statement-expression"
+#endif
+#define TRY(expr) ({ \
+	auto&& _tmp = (expr); \
+	if (not _tmp.has_value()) return Error{_tmp.error()}; \
+	try_unwrap(std::move(_tmp)); \
+})
+
 using Nothing = void;
 using Bool = bool;
 using Char = char;

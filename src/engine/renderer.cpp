@@ -8,7 +8,7 @@ auto Renderer::create(
 	Renderer result;
 	result.handle.reset(SDL_CreateRenderer(window.get(), name));
 	if (result.handle == nullptr) {
-		return Error{SDL_GetError()};
+		return Error{std::format("[SDL3] {}" , SDL_GetError())};
 	}
 	return result;
 }

@@ -12,7 +12,7 @@ auto Window::create(
 		0
 	));
 	if (result.handle == nullptr) {
-		return Error{SDL_GetError()};
+		return Error{std::format("[SDL3] {}" , SDL_GetError())};
 	}
 	return result;
 }
