@@ -4,8 +4,6 @@
 
 #include <SDL3/SDL_timer.h>
 
-#include <iostream>
-
 auto GameEngine::create(StringView title, Vec2<I32> windowSize) -> Result<GameEngine>
 {
 	SDL_InitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
