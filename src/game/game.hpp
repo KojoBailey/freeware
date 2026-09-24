@@ -4,7 +4,7 @@
 #include "grid.hpp"
 #include "app.hpp"
 
-class Game : public IGame {
+class FreeWare : public IGame {
 public:
 	auto init(GameEngine& engine) -> Result<Nothing> override;
 

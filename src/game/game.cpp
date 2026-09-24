@@ -2,7 +2,7 @@
 
 #include "../engine/components/rect_renderer.hpp"
 
-auto Game::init(GameEngine& engine) -> Result<Nothing> {
+auto FreeWare::init(GameEngine& engine) -> Result<Nothing> {
 	if (Result wallpaperResult = wallpaper.init(engine); not wallpaperResult.has_value()) {
 		return Error{wallpaperResult.error()};
 	}
@@ -45,7 +45,7 @@ auto Game::init(GameEngine& engine) -> Result<Nothing> {
 	return {};
 }
 
-auto Game::update(GameEngine& engine, F64 deltaTime) -> Result<Nothing> {
+auto FreeWare::update(GameEngine& engine, F64 deltaTime) -> Result<Nothing> {
 	timeElapsed += deltaTime;
 
 	// TODO: Wrap appPreview in its own class.

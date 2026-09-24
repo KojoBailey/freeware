@@ -8,6 +8,10 @@
 
 #include <SDL3/SDL_init.h>
 
+#include "components/rect_transform.hpp"
+#include "components/rect_renderer.hpp"
+#include "components/texture_renderer.hpp"
+
 #include <typeindex>
 
 class GameObject;
@@ -23,21 +27,17 @@ public:
 	~GameEngine() = default;
 
 	struct InitGameParam {
-		StringView name;
+		StringView title;
 		Vec2<I32> windowSize;
 	};
 
-	template<std::derived_from<IGame> T, typename... Args>
-	static auto initGame(
-		InitGameParam args,
-		Args&&... gameArgs
-	) -> Result<GameEngine>
+	static auto create(InitGameParam args) -> Result<GameEngine>
 	{
 		GameEngine result;
 
 		SDL_InitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
 		
-		auto maybeWindow = Window::create(args.name, args.windowSize);
+		auto maybeWindow = Window::create(args.title, args.windowSize);
 		if (not maybeWindow.has_value()) {
 			return Error(maybeWindow.error());
 		}
@@ -49,12 +49,96 @@ public:
 		}
 		result.renderer = std::move(*maybeRenderer);
 		
-		result.game = std::make_unique<T>(std::forward<Args>(gameArgs)...);
-		
 		return result;
 	}
 	
-	auto run() -> Result<Nothing>;
+	template<std::derived_from<IGame> Game>
+	auto run() -> Result<Nothing>
+	{
+		this->game = std::make_unique<Game>();
+			
+		isRunning = true;
+		
+		auto startResult = game->init(*this);
+		if (not startResult.has_value()) {
+			return Error(startResult.error());
+		}
+
+		U64 clockFrequency = SDL_GetPerformanceFrequency();
+		U64 lastClock = SDL_GetPerformanceCounter();
+		
+		while (isRunning) {
+			SDL_Event event;
+			while (SDL_PollEvent(&event)) {
+				mIsMouseDown = false;
+				switch (event.type) {
+				case SDL_EVENT_QUIT:
+					isRunning = false;
+					break;
+				case SDL_EVENT_MOUSE_BUTTON_DOWN:
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						mIsMouseDown = true;
+					}
+					break;
+				default: break;
+				}
+			}
+
+			U64 currentClock = SDL_GetPerformanceCounter();
+			F64 deltaTime = (F64)(currentClock - lastClock) / (F64)clockFrequency;
+			lastClock = currentClock;
+			auto updateResult = game->update(*this, deltaTime);
+			if (not updateResult.has_value()) {
+				return Error(updateResult.error());
+			}
+			
+			renderer.setDrawColor(0, 0, 0);
+			renderer.clear();
+			
+			auto& rectTransforms = getPool<RectTransform>();
+			auto& rectRenderers = getPool<RectRenderer>();
+			auto& textureRenderers = getPool<TextureRenderer>();
+
+			// TODO: Implement render order system.
+			
+			for (auto [handle, textureRenderer] : textureRenderers) {
+				Maybe<Ref<RectTransform>> maybeRectTransform = rectTransforms.get(handle);
+				if (not maybeRectTransform.has_value()) {
+					return Error("Tried to render TextureRenderer for GameObject without a RectTransform.");
+				}
+				RectTransform& rectTransform = std::move(*maybeRectTransform);
+				SDL_FRect sdlFRect = {
+					.x = rectTransform.position.x + textureRenderer.positionOffset.x,
+					.y = rectTransform.position.y + textureRenderer.positionOffset.y,
+					.w = rectTransform.size.x * textureRenderer.scale.x,
+					.h = rectTransform.size.y * textureRenderer.scale.y,
+				};
+				SDL_RenderTexture(renderer.get(), textureRenderer.texture->get(), nullptr, &sdlFRect);
+			}
+
+			for (auto [handle, rectRenderer] : rectRenderers) {
+				Maybe<Ref<RectTransform>> maybeRectTransform = rectTransforms.get(handle);
+				if (not maybeRectTransform.has_value()) {
+					return Error("Tried to render RectRenderer for GameObject without a RectTransform.");
+				}
+				RectTransform& rectTransform = std::move(*maybeRectTransform);
+				renderer.setDrawColor(rectRenderer.color);
+				SDL_FRect sdlFRect = {
+					.x = rectTransform.position.x + rectRenderer.positionOffset.x,
+					.y = rectTransform.position.y + rectRenderer.positionOffset.y,
+					.w = rectTransform.size.x * rectRenderer.scale.x,
+					.h = rectTransform.size.y * rectRenderer.scale.y,
+				};
+				SDL_RenderFillRect(renderer.get(), &sdlFRect);
+			}
+
+			renderer.draw();
+		}
+
+		SDL_Quit();
+		
+		return {};
+	}
 	
 	template<typename TComponent>
 	auto getPool() -> ComponentPool<TComponent>&
