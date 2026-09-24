@@ -26,18 +26,13 @@ public:
 
 	~GameEngine() = default;
 
-	struct InitGameParam {
-		StringView title;
-		Vec2<I32> windowSize;
-	};
-
-	static auto create(InitGameParam args) -> Result<GameEngine>
+	static auto create(StringView title, Vec2<I32> windowSize) -> Result<GameEngine>
 	{
 		GameEngine result;
 
 		SDL_InitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
 		
-		auto maybeWindow = Window::create(args.title, args.windowSize);
+		auto maybeWindow = Window::create(title, windowSize);
 		if (not maybeWindow.has_value()) {
 			return Error(maybeWindow.error());
 		}
