@@ -53,7 +53,7 @@ auto GameEngine::run() -> Result<Nothing>
 
 		// TODO: Implement render order system.
 		
-		for (auto [handle, textureRenderer] : textureRenderers.toIter()) {
+		for (auto [handle, textureRenderer] : textureRenderers) {
 			Maybe<Ref<RectTransform>> maybeRectTransform = rectTransforms.get(handle);
 			if (not maybeRectTransform.has_value()) {
 				return Error("Tried to render TextureRenderer for GameObject without a RectTransform.");
@@ -68,7 +68,7 @@ auto GameEngine::run() -> Result<Nothing>
 			SDL_RenderTexture(renderer.get(), textureRenderer.texture->get(), nullptr, &sdlFRect);
 		}
 
-		for (auto [handle, rectRenderer] : rectRenderers.toIter()) {
+		for (auto [handle, rectRenderer] : rectRenderers) {
 			Maybe<Ref<RectTransform>> maybeRectTransform = rectTransforms.get(handle);
 			if (not maybeRectTransform.has_value()) {
 				return Error("Tried to render RectRenderer for GameObject without a RectTransform.");

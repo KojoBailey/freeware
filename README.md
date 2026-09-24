@@ -66,3 +66,9 @@ There is no roadmap set out yet considering I could very well end up rewriting t
 As this is a learning experience as well as a passion project, contributions are closed for the timebeing, although I am always open to feedback. Likewise, AI has not and will not be used to generate code.
 
 As of now, FreeWare is licensed under the **GNU Affero General Public License v3.0**. This essentially means that the code for this project cannot be forked or re-distributed without also being kept as open-source under this same license. Since this is a game, this license is subject to change, but keeping it open-source is a goal all the same. It is only fitting given the game's theme, after all.
+
+### Reflections
+As I am it the process of developing my own programming language, below is a list of notes I have from this project about C++ in regards to language design:
+- It is annoying how you cannot extend existing types. This means I have to write `push(vec, item)` instead of `vec.push(item)`, for example.
+- Using `this->` does make code a lot easier to read as there's no question of "is this a global function, or might it be a local function that mutates the class's state". Even though C++ doesn't have an `&mut` like Rust does, knowing that a function is global rather than a class member at least lets you reason that said global function cannot mutate the class's state.
+- Duck typing, although powerful, isn't good for documenting **intent**. For example, the `ComponentPool` can be iterated upon since it implements `begin` and `end` methods, but there's no explicit annotation to say that it derives from `std::iterator_traits` or something of that effect. Compare this to a trait or typeclass system where you would be explicit.
