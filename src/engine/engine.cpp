@@ -2,6 +2,10 @@
 #include "SDL3/SDL_mouse.h"
 #include "game_object.hpp"
 
+#include "components/rect_transform.hpp"
+#include "components/rect_renderer.hpp"
+#include "components/texture_renderer.hpp"
+
 #include <SDL3/SDL_timer.h>
 
 auto GameEngine::create() -> Result<GameEngine>
@@ -9,6 +13,11 @@ auto GameEngine::create() -> Result<GameEngine>
 	SDL_InitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
 
 	return GameEngine{};
+}
+
+GameEngine::~GameEngine()
+{
+	SDL_Quit();
 }
 
 auto GameEngine::load(UniquePtr<IGame> game) -> Result<Nothing>
@@ -31,14 +40,14 @@ auto GameEngine::run() -> Result<Nothing>
 	while (isRunning) {
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
-			this->_isMouseDown = false;
+			this->_isLeftClickActive = false;
 			switch (event.type) {
 			case SDL_EVENT_QUIT:
 				isRunning = false;
 				break;
 			case SDL_EVENT_MOUSE_BUTTON_DOWN:
 				if (event.button.button == SDL_BUTTON_LEFT) {
-					this->_isMouseDown = true;
+					this->_isLeftClickActive = true;
 				}
 				break;
 			default: break;
@@ -101,9 +110,6 @@ auto GameEngine::run() -> Result<Nothing>
 		this->renderer.draw();
 	}
 
-	// TODO: Move to destructor.
-	SDL_Quit();
-	
 	return {};
 }
 
@@ -129,7 +135,7 @@ auto GameEngine::getMousePosition() -> Vec2<F32>
 	return mousePosition;
 }
 
-auto GameEngine::isMouseDown() -> Bool
+auto GameEngine::isLeftClickActive() -> Bool
 {
-	return _isMouseDown;
+	return _isLeftClickActive;
 }

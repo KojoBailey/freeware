@@ -8,12 +8,6 @@
 
 #include <SDL3/SDL_init.h>
 
-#include "components/rect_transform.hpp"
-#include "components/rect_renderer.hpp"
-#include "components/texture_renderer.hpp"
-
-#include <typeindex>
-
 class GameObject;
 
 class GameEngine {
@@ -24,9 +18,9 @@ public:
 	GameEngine(GameEngine&&) = default;
 	auto operator=(GameEngine&&) -> GameEngine& = default;
 
-	~GameEngine() = default;
-
 	static auto create() -> Result<GameEngine>;
+
+	~GameEngine();
 
 	auto load(UniquePtr<IGame> game) -> Result<Nothing>;
 	
@@ -35,7 +29,7 @@ public:
 	template<typename TComponent>
 	auto getPool() -> ComponentPool<TComponent>&
 	{
-		auto type = std::type_index(typeid(TComponent));
+		auto type = TypeIndex{typeid(TComponent)};
 		auto it = componentPools.find(type);
 		if (it == componentPools.end()) {
 			auto [inserted, ok] = componentPools.emplace(type, std::make_unique<ComponentPool<TComponent>>());
@@ -50,7 +44,7 @@ public:
 	auto createTexture(const FilePath& path) -> Result<Texture>;
 
 	auto getMousePosition() -> Vec2<F32>;
-	auto isMouseDown() -> Bool; // NOTE: Only detects left-click.
+	auto isLeftClickActive() -> Bool;
 	
 private:
 	UniquePtr<IGame> game;
@@ -60,9 +54,9 @@ private:
 	// NOTE: Start at 1 so that 0 is the empty handle.
 	U32 lastEntityIndex = 1;
 	
-	HashMap<std::type_index, UniquePtr<IComponentPool>> componentPools;
+	HashMap<TypeIndex, UniquePtr<IComponentPool>> componentPools;
 
-	Bool _isMouseDown{false};
+	Bool _isLeftClickActive{false};
 	
 	GameEngine() = default;
 };

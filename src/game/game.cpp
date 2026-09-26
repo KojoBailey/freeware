@@ -66,7 +66,7 @@ auto FreeWare::update(GameEngine& engine, F64 deltaTime) -> Result<Nothing> {
 	}
 	appPreviewTransform->get().position -= appPreviewTransform->get().size / 2.0f;
 
-	if (engine.isMouseDown() and grid.isTileFree(tileIndex.x, tileIndex.y)) {
+	if (engine.isLeftClickActive() and grid.isTileFree(tileIndex.x, tileIndex.y)) {
 		Result maybeApp = App::create(engine, AppType::Vim, vimTexture);
 		if (not maybeApp.has_value()) {
 			return Error{maybeApp.error()};

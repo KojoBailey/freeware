@@ -11,6 +11,7 @@
 #include <string>
 #include <string_view>
 #include <type_traits> // IWYU pragma: keep
+#include <typeindex>
 #include <unordered_map>
 #include <vector>
 
@@ -99,6 +100,8 @@ using UniquePtr = std::unique_ptr<T, D>;
 
 template<typename T>
 using SharedPtr = std::shared_ptr<T>;
+
+using TypeIndex = std::type_index;
 
 template<typename T>
 class Vec2 {

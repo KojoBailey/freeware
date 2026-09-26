@@ -9,10 +9,13 @@ class GameObject {
 
 public:
 	GameObject() = default;
+
 	GameObject(const GameObject& other);
 	auto operator=(const GameObject& other) -> GameObject&;
+
 	GameObject(GameObject&& other) noexcept;
 	auto operator=(GameObject&& other) noexcept -> GameObject&;
+
 	~GameObject();
 
 	template<typename TComponent, typename... Args>
@@ -37,16 +40,12 @@ public:
 	}
 
 	template<typename TComponent>
-	auto getComponent() -> Maybe<Ref<TComponent>>
-	{
-		return engine->getPool<TComponent>().get(handle);
-	}
+	auto getComponent()
+		-> Maybe<Ref<TComponent>> { return engine->getPool<TComponent>().get(handle); }
 
 	template<typename TComponent>
-	auto getComponent() const -> Maybe<Ref<TComponent>>
-	{
-		return engine->getPool<TComponent>().get(handle);
-	}
+	auto getComponent() const
+		-> Maybe<Ref<TComponent>> { return engine->getPool<TComponent>().get(handle); }
 
 private:
 	GameEngine* engine;
