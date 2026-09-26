@@ -22,30 +22,30 @@ public:
 	auto addComponent(Args&&... componentArgs) -> TComponent&
 	{
 		componentChecklist.set(ComponentIndex<TComponent>::value);
-		return engine->getPool<TComponent>().emplace(handle, TComponent{std::forward<Args>(componentArgs)...});
+		return engine->getOrCreatePool<TComponent>().emplace(handle, TComponent{std::forward<Args>(componentArgs)...});
 	}
 
 	template<typename TComponent, typename... Args>
 	auto copyComponent(const TComponent& component) -> TComponent&
 	{
 		componentChecklist.set(ComponentIndex<TComponent>::value);
-		return engine->getPool<TComponent>().emplace(handle, component);
+		return engine->getOrCreatePool<TComponent>().emplace(handle, component);
 	}
 
 	template<typename TComponent>
 	void removeComponent()
 	{
 		componentChecklist.reset(ComponentIndex<TComponent>::value);
-		engine->getPool<TComponent>().remove(handle);
+		engine->getOrCreatePool<TComponent>().remove(handle);
 	}
 
 	template<typename TComponent>
 	auto getComponent()
-		-> Maybe<Ref<TComponent>> { return engine->getPool<TComponent>().get(handle); }
+		-> Maybe<Ref<TComponent>> { return engine->getOrCreatePool<TComponent>().get(handle); }
 
 	template<typename TComponent>
 	auto getComponent() const
-		-> Maybe<Ref<TComponent>> { return engine->getPool<TComponent>().get(handle); }
+		-> Maybe<Ref<TComponent>> { return engine->getOrCreatePool<TComponent>().get(handle); }
 
 private:
 	GameEngine* engine;

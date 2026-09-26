@@ -1,5 +1,6 @@
 #include "engine.hpp"
 #include "SDL3/SDL_mouse.h"
+#include "engine/component_pool.hpp"
 #include "game_object.hpp"
 
 #include "components/rect_transform.hpp"
@@ -30,29 +31,39 @@ auto GameEngine::load(UniquePtr<IGame> game) -> Result<Nothing>
 
 	return {};
 }
+
+auto GameEngine::processEvents() -> QuitStatus
+{
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		this->_isLeftClickActive = false;
+
+		switch (event.type) {
+		case SDL_EVENT_QUIT:
+			return QuitStatus::ShouldQuit;
+
+		case SDL_EVENT_MOUSE_BUTTON_DOWN:
+			if (event.button.button == SDL_BUTTON_LEFT) {
+				this->_isLeftClickActive = true;
+			}
+			break;
+		}
+	}
+
+	return QuitStatus::ShouldNotQuit;
+}
 	
 auto GameEngine::run() -> Result<Nothing>
 {
 	U64 clockFrequency = SDL_GetPerformanceFrequency();
 	U64 lastClock = SDL_GetPerformanceCounter();
 	
-	Bool isRunning = true;
-	while (isRunning) {
-		SDL_Event event;
-		while (SDL_PollEvent(&event)) {
-			this->_isLeftClickActive = false;
-			switch (event.type) {
-			case SDL_EVENT_QUIT:
-				isRunning = false;
-				break;
-			case SDL_EVENT_MOUSE_BUTTON_DOWN:
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					this->_isLeftClickActive = true;
-				}
-				break;
-			default: break;
-			}
-		}
+	ComponentPool<RectTransform>&   rectTransforms   = this->getOrCreatePool<RectTransform>();
+	ComponentPool<RectRenderer>&    rectRenderers    = this->getOrCreatePool<RectRenderer>();
+	ComponentPool<TextureRenderer>& textureRenderers = this->getOrCreatePool<TextureRenderer>();
+
+	while (true) {
+		if (this->processEvents() == QuitStatus::ShouldQuit) break;
 
 		U64 currentClock = SDL_GetPerformanceCounter();
 		F64 deltaTime = (F64)(currentClock - lastClock) / (F64)clockFrequency;
@@ -65,10 +76,6 @@ auto GameEngine::run() -> Result<Nothing>
 		this->renderer.setDrawColor(0, 0, 0);
 		this->renderer.clear();
 		
-		auto& rectTransforms   = this->getPool<RectTransform>();
-		auto& rectRenderers    = this->getPool<RectRenderer>();
-		auto& textureRenderers = this->getPool<TextureRenderer>();
-
 		// TODO: Implement render order system.
 		
 		for (auto [handle, textureRenderer] : textureRenderers) {
@@ -123,10 +130,8 @@ auto GameEngine::registerGameObject() -> U32
 	return lastEntityIndex++;
 }
 
-auto GameEngine::createTexture(const FilePath& path) -> Result<Texture>
-{
-	return Texture::create(renderer, path);
-}
+auto GameEngine::createTexture(const FilePath& path)
+	-> Result<Texture> { return Texture::create(renderer, path); }
 
 auto GameEngine::getMousePosition() -> Vec2<F32>
 {
@@ -135,7 +140,5 @@ auto GameEngine::getMousePosition() -> Vec2<F32>
 	return mousePosition;
 }
 
-auto GameEngine::isLeftClickActive() -> Bool
-{
-	return _isLeftClickActive;
-}
+auto GameEngine::isLeftClickActive()
+	-> Bool { return _isLeftClickActive; }

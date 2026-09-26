@@ -1,21 +1,8 @@
 #pragma once
 
 #include "pch.hpp"
+#include "util.hpp"
 #include "game_object_handle.hpp"
-
-// PERF: Calculating the index *before* pushing back to the vector
-// avoids calculating subtraction with `vector.size() - 1`.
-template<typename T>
-auto pushAndGetIndex(Vector<T>& vector , const T& item) -> USz
-{
-	USz lastIndex = vector.size();
-	vector.push_back(std::move(item));
-	return lastIndex;
-}
-
-template<typename Container , std::input_iterator Iterator>
-auto wasFindSuccessful(Iterator iterator , const Container& container)
-	-> Bool { return iterator != container.end(); }
 
 // NOTE: `ComponentPool<T>` is templated, and this is the best way to generically
 // store different instantiations of it, since `ComponentPool` alone doesn't suffice fsr.
@@ -54,10 +41,6 @@ public:
 	
 	auto get(GameObjectHandle handle) -> Maybe<Ref<TComponent>>
 	{
-		// PERF: `unordered_map::at` throws an exception on no find which is costly.
-		// Hence, iterators must be used explicitly, even though the key is unimportant.
-		// NOTE: This would be cleaner if the STL had an `unordered_map::maybe_at` method
-		// that returned an `optional<T&>`.
 		auto iterator = this->componentIndexByHandle.find(handle.key);
 		if (not wasFindSuccessful(iterator , this->componentIndexByHandle))
 			return {};

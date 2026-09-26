@@ -1,6 +1,7 @@
 #pragma once
 
 #include "pch.hpp"
+#include "util.hpp"
 #include "i_game.hpp"
 #include "renderer.hpp"
 #include "component_pool.hpp"
@@ -27,15 +28,17 @@ public:
 	auto run() -> Result<Nothing>;
 	
 	template<typename TComponent>
-	auto getPool() -> ComponentPool<TComponent>&
+	auto getOrCreatePool() -> ComponentPool<TComponent>&
 	{
-		auto type = TypeIndex{typeid(TComponent)};
-		auto it = componentPools.find(type);
-		if (it == componentPools.end()) {
-			auto [inserted, ok] = componentPools.emplace(type, std::make_unique<ComponentPool<TComponent>>());
-			it = inserted;
+		TypeIndex type = typeid(TComponent);
+		auto iterator = this->componentPoolByTypeIndex.find(type);
+		if (not wasFindSuccessful(iterator , this->componentPoolByTypeIndex)) {
+			auto [insertedIterator,didInsert] = this->componentPoolByTypeIndex.emplace(
+				type, std::make_unique<ComponentPool<TComponent>>());
+			iterator = insertedIterator;
 		}
-		return static_cast<ComponentPool<TComponent>&>(*it->second);
+		auto& [key,componentPool] = *iterator;
+		return static_cast<ComponentPool<TComponent>&>(*componentPool);
 	}
 	
 	auto createGameObject() -> GameObject;
@@ -54,9 +57,11 @@ private:
 	// NOTE: Start at 1 so that 0 is the empty handle.
 	U32 lastEntityIndex = 1;
 	
-	HashMap<TypeIndex, UniquePtr<IComponentPool>> componentPools;
+	HashMap<TypeIndex, UniquePtr<IComponentPool>> componentPoolByTypeIndex;
 
 	Bool _isLeftClickActive{false};
 	
 	GameEngine() = default;
+
+	auto processEvents() -> QuitStatus;
 };
