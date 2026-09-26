@@ -7,10 +7,7 @@
 
 class Window {
 public:
-	static auto create(
-		StringView title,
-		const Vec2<I32> size
-	) -> Result<Window>;
+	static auto create(StringView title , const Vec2<I32> size) -> Result<Window>;
     
 	auto get() const -> SDL_Window*;
 

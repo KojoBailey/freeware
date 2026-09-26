@@ -51,6 +51,7 @@ private:
 	GameEngine* engine;
 	GameObjectHandle handle;
 
+	// TODO: Wrap in abstraction?
 	Bitset<3> componentChecklist{false};
 	
 	GameObject(GameEngine* _engine, U32 index);

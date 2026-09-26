@@ -7,9 +7,9 @@ auto Window::create(
 {
 	Window result;
 	result.handle.reset(SDL_CreateWindow(
-		title.data(), 
-		size.x, size.y, 
-		0
+		/*title=*/title.data(), 
+		/*w=*/size.x, /*h=*/size.y, 
+		/*flags=*/0
 	));
 	if (result.handle == nullptr) {
 		return Error{std::format("[SDL3] {}" , SDL_GetError())};

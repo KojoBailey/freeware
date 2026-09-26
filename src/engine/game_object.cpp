@@ -3,6 +3,8 @@
 #include "components/rect_renderer.hpp"
 #include "components/texture_renderer.hpp"
 
+// TODO: Refactor for code cleanness.
+
 GameObject::GameObject(GameEngine* _engine, U32 index)
 	: engine{_engine} 
 {
