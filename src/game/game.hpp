@@ -6,6 +6,9 @@
 
 class FreeWare : public IGame {
 public:
+	auto getTitle() const -> StringView override;
+	auto getWindowSize() const -> Vec2<I32> override;
+
 	auto init(GameEngine& engine) -> Result<Nothing> override;
 
     auto update(GameEngine& engine, F64 deltaTime) -> Result<Nothing> override;

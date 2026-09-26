@@ -2,11 +2,7 @@
 
 auto main() -> CInt
 {
-	// TODO: These args don't relate to the game engine. They should be under the IGame class.
-	auto maybeEngine = GameEngine::create(
-		"FreeWare",
-		{.x = 1280, .y = 720}
-	);
+	auto maybeEngine = GameEngine::create();
 	if (not maybeEngine.has_value()) {
 		std::println(stderr , "GameEngine create error:\n  {}" , maybeEngine.error());
 		return 1;

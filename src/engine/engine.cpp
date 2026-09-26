@@ -4,20 +4,21 @@
 
 #include <SDL3/SDL_timer.h>
 
-auto GameEngine::create(StringView title, Vec2<I32> windowSize) -> Result<GameEngine>
+auto GameEngine::create() -> Result<GameEngine>
 {
 	SDL_InitSubSystem(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
 
-	GameEngine result;
-	result.window = TRY(Window::create(title, windowSize));
-	result.renderer = TRY(Renderer::create(result.window));	
-	return result;
+	return GameEngine{};
 }
 
 auto GameEngine::load(UniquePtr<IGame> game) -> Result<Nothing>
 {
+	this->window = TRY(Window::create(game->getTitle(), game->getWindowSize()));
+	this->renderer = TRY(Renderer::create(this->window));	
+
 	TRY(game->init(*this));
 	this->game = std::move(game);
+
 	return {};
 }
 	

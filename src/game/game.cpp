@@ -2,6 +2,11 @@
 
 #include "../engine/components/rect_renderer.hpp"
 
+auto FreeWare::getTitle() const
+	-> StringView { return "FreeWare"; }
+auto FreeWare::getWindowSize() const
+	-> Vec2<I32> { return { .x = 1280, .y = 720 }; }
+
 auto FreeWare::init(GameEngine& engine) -> Result<Nothing> {
 	if (Result wallpaperResult = wallpaper.init(engine); not wallpaperResult.has_value()) {
 		return Error{wallpaperResult.error()};

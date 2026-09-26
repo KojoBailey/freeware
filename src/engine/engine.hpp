@@ -26,7 +26,7 @@ public:
 
 	~GameEngine() = default;
 
-	static auto create(StringView title, Vec2<I32> windowSize) -> Result<GameEngine>;
+	static auto create() -> Result<GameEngine>;
 
 	auto load(UniquePtr<IGame> game) -> Result<Nothing>;
 	
