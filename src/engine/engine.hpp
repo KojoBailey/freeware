@@ -59,9 +59,14 @@ private:
 	
 	HashMap<TypeIndex, UniquePtr<IComponentPool>> componentPoolByTypeIndex;
 
+	U64 clockFrequency;
+	U64 lastTimestamp;
+	F64 deltaTime;
 	Bool _isLeftClickActive{false};
 	
 	GameEngine() = default;
 
 	auto processEvents() -> QuitStatus;
+	void updateDeltaTime();
+	auto render() -> Result<Nothing>;
 };

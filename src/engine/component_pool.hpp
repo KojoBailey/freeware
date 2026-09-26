@@ -48,7 +48,7 @@ public:
 		return this->components[componentIndex];
 	}
 	
-	auto has(GameObjectHandle handle) -> Bool
+	auto has(GameObjectHandle handle) const -> Bool
 	{
 		return this->componentIndexByHandle.contains(handle.key);
 	}
