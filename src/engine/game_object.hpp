@@ -21,32 +21,32 @@ public:
 	template<typename TComponent, typename... Args>
 	auto addComponent(Args&&... componentArgs) -> TComponent&
 	{
-		componentChecklist.tick<TComponent>();
-		return engine->getOrCreatePool<TComponent>().emplace(
-			handle, TComponent{std::forward<Args>(componentArgs)...});
+		this->componentChecklist.tick<TComponent>();
+		return this->engine->getOrCreatePool<TComponent>().emplace(
+			this->handle, TComponent{std::forward<Args>(componentArgs)...});
 	}
 
-	template<typename TComponent, typename... Args>
+	template<typename TComponent>
 	auto copyComponent(const TComponent& component) -> TComponent&
 	{
-		componentChecklist.tick<TComponent>();
-		return engine->getOrCreatePool<TComponent>().emplace(handle, component);
+		this->componentChecklist.tick<TComponent>();
+		return this->engine->getOrCreatePool<TComponent>().emplace(this->handle, component);
 	}
 
 	template<typename TComponent>
 	void removeComponent()
 	{
-		componentChecklist.untick<TComponent>();
-		engine->getOrCreatePool<TComponent>().remove(handle);
+		this->componentChecklist.untick<TComponent>();
+		this->engine->getPool<TComponent>().remove(this->handle);
 	}
 
 	template<typename TComponent>
 	auto getComponent()
-		-> Maybe<Ref<TComponent>> { return engine->getOrCreatePool<TComponent>().get(handle); }
+		-> Maybe<Ref<TComponent>> { return this->engine->getPool<TComponent>().get(this->handle); }
 
 	template<typename TComponent>
 	auto getComponent() const
-		-> Maybe<Ref<TComponent>> { return engine->getOrCreatePool<TComponent>().get(handle); }
+		-> Maybe<Ref<TComponent>> { return this->engine->getPool<TComponent>().get(this->handle); }
 
 private:
 	GameEngine* engine;

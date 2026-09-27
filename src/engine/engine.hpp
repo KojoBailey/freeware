@@ -40,6 +40,13 @@ public:
 		auto& [key,componentPool] = *iterator;
 		return static_cast<ComponentPool<TComponent>&>(*componentPool);
 	}
+
+	template<typename TComponent>
+	auto getPool() -> ComponentPool<TComponent>&
+	{
+		return static_cast<ComponentPool<TComponent>&>(
+			*componentPoolByTypeIndex.at(typeid(TComponent)));
+	}
 	
 	auto createGameObject() -> GameObject;
 	auto registerGameObject() -> U32;
