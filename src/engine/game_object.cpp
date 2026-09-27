@@ -62,45 +62,26 @@ void GameObject::removeAllComponents()
 {
 	if (handle.key == 0) return;
 
-	for (USz i = 0; i < componentChecklist.size(); i++) {
-		bool hasComponentT = componentChecklist[i];
-		if (not hasComponentT) {
-			continue;
-		}
-
-		switch (i) {
-		case ComponentIndex<RectTransform>::value:
-			removeComponent<RectTransform>();
-			break;
-		case ComponentIndex<RectRenderer>::value:
-			removeComponent<RectRenderer>();
-			break;
-		case ComponentIndex<TextureRenderer>::value:
-			removeComponent<TextureRenderer>();
-			break;
-		}
+	if (componentChecklist.isTicked<RectTransform>()) {
+		removeComponent<RectTransform>();
+	}
+	if (componentChecklist.isTicked<RectRenderer>()) {
+		removeComponent<RectRenderer>();
+	}
+	if (componentChecklist.isTicked<TextureRenderer>()) {
+		removeComponent<TextureRenderer>();
 	}
 }
 
 void GameObject::copyAllComponents(const GameObject& other)
 {
-	for (USz i = 0; i < componentChecklist.size(); i++) {
-		bool hasComponentT = componentChecklist[i];
-		if (not hasComponentT) {
-			continue;
-		}
-
-		switch (i) {
-		case ComponentIndex<RectTransform>::value:
-			copyComponent<RectTransform>(*other.getComponent<RectTransform>());
-			break;
-		case ComponentIndex<RectRenderer>::value:
-			copyComponent<RectRenderer>(*other.getComponent<RectRenderer>());
-			break;
-		case ComponentIndex<TextureRenderer>::value:
-			copyComponent<TextureRenderer>(*other.getComponent<TextureRenderer>());
-			break;
-		}
+	if (componentChecklist.isTicked<RectTransform>()) {
+		copyComponent<RectTransform>(*other.getComponent<RectTransform>());
+	}
+	if (componentChecklist.isTicked<RectRenderer>()) {
+		copyComponent<RectRenderer>(*other.getComponent<RectRenderer>());
+	}
+	if (componentChecklist.isTicked<TextureRenderer>()) {
+		copyComponent<TextureRenderer>(*other.getComponent<TextureRenderer>());
 	}
 }
-

@@ -21,21 +21,22 @@ public:
 	template<typename TComponent, typename... Args>
 	auto addComponent(Args&&... componentArgs) -> TComponent&
 	{
-		componentChecklist.set(ComponentIndex<TComponent>::value);
-		return engine->getOrCreatePool<TComponent>().emplace(handle, TComponent{std::forward<Args>(componentArgs)...});
+		componentChecklist.tick<TComponent>();
+		return engine->getOrCreatePool<TComponent>().emplace(
+			handle, TComponent{std::forward<Args>(componentArgs)...});
 	}
 
 	template<typename TComponent, typename... Args>
 	auto copyComponent(const TComponent& component) -> TComponent&
 	{
-		componentChecklist.set(ComponentIndex<TComponent>::value);
+		componentChecklist.tick<TComponent>();
 		return engine->getOrCreatePool<TComponent>().emplace(handle, component);
 	}
 
 	template<typename TComponent>
 	void removeComponent()
 	{
-		componentChecklist.reset(ComponentIndex<TComponent>::value);
+		componentChecklist.untick<TComponent>();
 		engine->getOrCreatePool<TComponent>().remove(handle);
 	}
 
@@ -51,8 +52,7 @@ private:
 	GameEngine* engine;
 	GameObjectHandle handle;
 
-	// TODO: Wrap in abstraction?
-	Bitset<3> componentChecklist{false};
+	ComponentChecklist componentChecklist;
 	
 	GameObject(GameEngine* _engine, U32 index);
 
