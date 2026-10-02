@@ -34,7 +34,7 @@ public:
 	auto emplace(GameObjectHandle handle , TComponent component) -> TComponent&
 	{
 		this->handleByComponentIndex.push_back(handle);
-		USz newComponentIndex = pushAndGetIndex(components, std::move(component));
+		USz newComponentIndex = components | pushAndGetIndex(std::move(component));
 		this->componentIndexByHandle[handle.key] = newComponentIndex;
 		return this->components[newComponentIndex];
 	}

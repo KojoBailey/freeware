@@ -99,9 +99,12 @@ auto GameEngine::render() -> Result<Nothing>
 	
 	// TODO: Implement render order system.
 	
-	ComponentPool<RectTransform	 >& rectTransforms   = this->getOrCreatePool<RectTransform>();
-	ComponentPool<RectRenderer   >& rectRenderers    = this->getOrCreatePool<RectRenderer>();
-	ComponentPool<TextureRenderer>& textureRenderers = this->getOrCreatePool<TextureRenderer>();
+	ComponentPool<RectTransform>& rectTransforms =
+		this->getOrCreatePool<RectTransform>();
+	ComponentPool<RectRenderer>& rectRenderers =
+		this->getOrCreatePool<RectRenderer>();
+	ComponentPool<TextureRenderer>& textureRenderers =
+		this->getOrCreatePool<TextureRenderer>();
 
 	for (auto [handle, textureRenderer] : textureRenderers) {
 		Maybe<Ref<RectTransform>> maybeRectTransform = rectTransforms.get(handle);

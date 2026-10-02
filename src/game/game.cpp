@@ -25,10 +25,10 @@ auto FreeWare::init(GameEngine& engine) -> Result<Nothing> {
 	vimTexture = std::make_shared<Texture>(std::move(*maybeVimTexture));
 
 	// TODO: Make app preview translucent.
-	appPreview = engine.createGameObject();
-	appPreview.addComponent<RectTransform>()
+	this->appPreview = engine.createGameObject();
+	this->appPreview.addComponent<RectTransform>()
 		.withSize({ .x = 70.0f, .y = 70.0f });
-	appPreview.addComponent<TextureRenderer>()
+	this->appPreview.addComponent<TextureRenderer>()
 		.withTexture(vimTexture);
 
 	firewall = engine.createGameObject();

@@ -63,7 +63,7 @@ private:
 	
 	// NOTE: Start at 1 so that 0 is the empty handle.
 	// TODO: Wrap in abstraction.
-	U32 lastEntityIndex = 1;
+	U32 lastEntityIndex = 0;
 	
 	HashMap<TypeIndex, UniquePtr<IComponentPool>> componentPoolByTypeIndex;
 
