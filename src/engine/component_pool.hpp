@@ -43,7 +43,7 @@ public:
 	{
 		auto iterator = this->componentIndexByHandle.find(handle.key);
 		if (not wasFindSuccessful(iterator , this->componentIndexByHandle))
-			return {};
+			return std::nullopt;
 		auto& [key,componentIndex] = *iterator;
 		return this->components[componentIndex];
 	}

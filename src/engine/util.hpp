@@ -16,18 +16,18 @@ auto pushAndGetIndex(Vector<T>& vector , U&& item) -> USz
 }
 
 template<typename T>
-struct _PushAndGetIndex {
+struct PushAndGetIndexClosure {
 	T&& item;
 };
 
 template<typename T>
-_PushAndGetIndex(T&&) -> _PushAndGetIndex<T>;
+PushAndGetIndexClosure(T&&) -> PushAndGetIndexClosure<T>;
 
 template<typename T>
-auto pushAndGetIndex(T&& item) { return _PushAndGetIndex{std::forward<T>(item)}; }
+auto pushAndGetIndex(T&& item) { return PushAndGetIndexClosure{std::forward<T>(item)}; }
 
 template<typename T , typename U>
-auto operator|(Vector<T>& vec , _PushAndGetIndex<U>&& obj)
+auto operator|(Vector<T>& vec , PushAndGetIndexClosure<U>&& obj)
 	-> USz { return pushAndGetIndex(vec , std::forward<U>(obj.item)); }
 
 template<typename Container , std::input_iterator Iterator>
