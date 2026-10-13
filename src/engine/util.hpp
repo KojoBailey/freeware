@@ -34,6 +34,31 @@ template<typename Container , std::input_iterator Iterator>
 auto wasFindSuccessful(Iterator iterator , const Container& container)
 	-> Bool { return iterator != container.end(); }
 
+template<typename TKey, typename TValue>
+auto lookup(HashMap<TKey, TValue>& map, const TKey& targetKey) -> Maybe<TValue&>
+{
+	auto iterator = map.find(targetKey);
+	if (not wasFindSuccessful(iterator , map))
+		return std::nullopt;
+	auto& [_,value] = *iterator;
+	return value;
+}
+
+template<typename TKey>
+struct LookupClosure {
+	TKey&& targetKey;
+};
+
+template<typename TKey>
+LookupClosure(TKey&&) -> LookupClosure<TKey>;
+
+template<typename TKey>
+auto lookup(TKey&& targetKey) { return LookupClosure{std::forward<TKey>(targetKey)}; }
+
+template<typename TKey , typename TValue, typename T>
+auto operator|(HashMap<TKey, TValue>& map , LookupClosure<T>&& obj)
+	-> Maybe<TValue&> { return lookup(map , std::forward<T>(obj.targetKey)); }
+
 enum class QuitStatus {
 	ShouldQuit,
 	ShouldNotQuit,

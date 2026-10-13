@@ -56,10 +56,8 @@ auto GameEngine::createGameObject() -> GameObject
 	return GameObject{this, lastEntityIndex++};
 }
 
-auto GameEngine::registerGameObject() -> U32
-{
-	return lastEntityIndex++;
-}
+auto GameEngine::registerGameObject()
+	-> U32 { return lastEntityIndex++; }
 
 auto GameEngine::createTexture(const FilePath& path)
 	-> Result<Texture> { return Texture::create(renderer, path); }

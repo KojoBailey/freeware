@@ -12,63 +12,60 @@ template<typename TComponent>
 class ComponentPool : public IComponentPool {
 private:
 	struct Iterator {
-		ComponentPool& self;
+		ComponentPool& pool;
 		USz index;
 		
-		auto operator!=(const Iterator& other)
-			-> Bool { return this->index != other.index; }
+		auto operator!=(this auto& self, const Iterator& other)
+			-> Bool { return self.index != other.index; }
 
-		void operator++()
+		void operator++(this auto& self)
 		{
-			++this->index;
+			++self.index;
 		}
 
-		auto operator*() -> Pair<GameObjectHandle&,TComponent&>
+		auto operator*(this auto& self) -> Pair<GameObjectHandle&,TComponent&>
 		{
-			return {self.handleByComponentIndex[this->index] , self.components[this->index]};
+			return {self.pool.handleByComponentIndex[self.index] , self.pool.components[self.index]};
 		}
 	};
 
 public:
 	// WARN: Does not account for allocation failure.
-	auto emplace(GameObjectHandle handle , TComponent component) -> TComponent&
+	auto emplace(this auto& self, GameObjectHandle handle , TComponent component) -> TComponent&
 	{
-		this->handleByComponentIndex.push_back(handle);
-		USz newComponentIndex = components | pushAndGetIndex(std::move(component));
-		this->componentIndexByHandle[handle.key] = newComponentIndex;
-		return this->components[newComponentIndex];
+		self.handleByComponentIndex.push_back(handle);
+		USz newComponentIndex = self.components | pushAndGetIndex(std::move(component));
+		self.componentIndexByHandle[handle.key] = newComponentIndex;
+		return self.components[newComponentIndex];
 	}
 	
-	auto get(GameObjectHandle handle) -> Maybe<Ref<TComponent>>
+	auto get(this auto& self, GameObjectHandle handle) -> Maybe<TComponent&>
 	{
-		auto iterator = this->componentIndexByHandle.find(handle.key);
-		if (not wasFindSuccessful(iterator , this->componentIndexByHandle))
-			return std::nullopt;
-		auto& [key,componentIndex] = *iterator;
-		return this->components[componentIndex];
+		return (self.componentIndexByHandle | lookup(handle.key))
+			.transform([&](auto componentIndex) -> auto& { return self.components[componentIndex]; });
 	}
 	
-	auto has(GameObjectHandle handle) const -> Bool
+	auto has(this const auto& self, GameObjectHandle handle) -> Bool
 	{
-		return this->componentIndexByHandle.contains(handle.key);
+		return self.componentIndexByHandle.contains(handle.key);
 	}
 
-	void remove(GameObjectHandle handle)
+	void remove(this auto& self, GameObjectHandle handle)
 	{
-		USz removalIndex = this->componentIndexByHandle.at(handle.key);
-		USz componentToMoveIndex = this->components.size() - 1;
-		this->components[removalIndex] = std::move( this->components[componentToMoveIndex]);
-		auto movedComponentHandle = this->handleByComponentIndex[componentToMoveIndex];
-		this->handleByComponentIndex[removalIndex] = movedComponentHandle;
-		this->componentIndexByHandle[movedComponentHandle.key] = removalIndex;
-		this->components.pop_back();
+		USz removalIndex = self.componentIndexByHandle.at(handle.key);
+		USz componentToMoveIndex = self.components.size() - 1;
+		self.components[removalIndex] = std::move( self.components[componentToMoveIndex]);
+		auto movedComponentHandle = self.handleByComponentIndex[componentToMoveIndex];
+		self.handleByComponentIndex[removalIndex] = movedComponentHandle;
+		self.componentIndexByHandle[movedComponentHandle.key] = removalIndex;
+		self.components.pop_back();
 	}
 	
-	auto begin()
-		-> Iterator { return {*this,0}; }
+	auto begin(this auto& self)
+		-> Iterator { return {self,0}; }
 
-	auto end()
-		-> Iterator { return {*this,this->components.size()}; }
+	auto end(this auto& self)
+		-> Iterator { return {self,self.components.size()}; }
 
 private:
 	Vector<TComponent> components;
